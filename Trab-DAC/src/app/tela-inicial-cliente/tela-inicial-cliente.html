@@ -1,0 +1,209 @@
+<div class="dashboard-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect width="28" height="28" rx="8" fill="#1a3a5c"/>
+            <path d="M6 18L10 10L14 15L18 8L22 18H6Z" fill="#4fc3f7" opacity="0.9"/>
+            <circle cx="14" cy="20" r="2" fill="#4fc3f7"/>
+          </svg>
+        </div>
+        <span class="brand-name" *ngIf="!sidebarCollapsed">BANTADS</span>
+      </div>
+      <button class="collapse-btn" (click)="toggleSidebar()" title="Recolher menu">
+        <span class="material-icons">{{ sidebarCollapsed ? 'chevron_right' : 'chevron_left' }}</span>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label" *ngIf="!sidebarCollapsed">CONTA</div>
+
+      <a class="nav-item active" title="Início">
+        <span class="material-icons">home</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Início</span>
+      </a>
+      <a class="nav-item" (click)="navegarPara('deposito')" title="Depositar">
+        <span class="material-icons">add_circle_outline</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Depositar</span>
+      </a>
+      <a class="nav-item" (click)="navegarPara('saque')" title="Sacar">
+        <span class="material-icons">remove_circle_outline</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Sacar</span>
+      </a>
+      <a class="nav-item" (click)="navegarPara('transferencia')" title="Transferência">
+        <span class="material-icons">swap_horiz</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Transferência</span>
+      </a>
+      <a class="nav-item" (click)="navegarPara('extrato')" title="Extrato">
+        <span class="material-icons">receipt_long</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Extrato</span>
+      </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section-label" *ngIf="!sidebarCollapsed">PERFIL</div>
+
+      <a class="nav-item" (click)="navegarPara('perfil')" title="Meu Perfil">
+        <span class="material-icons">manage_accounts</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Meu Perfil</span>
+      </a>
+      <a class="nav-item nav-item--danger" (click)="logout()" title="Sair">
+        <span class="material-icons">logout</span>
+        <span class="nav-label" *ngIf="!sidebarCollapsed">Sair</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer" *ngIf="!sidebarCollapsed">
+      <div class="user-chip">
+        <div class="user-avatar">{{ clienteIniciais }}</div>
+        <div class="user-info">
+          <span class="user-name">{{ cliente?.nome | slice:0:14 }}</span>
+          <span class="user-role">Cliente</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title">Olá, <strong>{{ primeiroNome }}</strong> 👋</h1>
+        <p class="page-subtitle">{{ dataAtual | date:'EEEE, d \'de\' MMMM \'de\' yyyy':'':'pt-BR' }}</p>
+      </div>
+      <div class="topbar-right">
+        <div class="notification-btn" title="Notificações">
+          <span class="material-icons">notifications_none</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Loading Spinner -->
+    <div class="loading-overlay" *ngIf="carregando">
+      <div class="spinner"></div>
+      <p>Carregando seus dados...</p>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <section class="dashboard-grid" *ngIf="!carregando">
+
+      <!-- Card Saldo Principal -->
+      <div class="card card--saldo card--highlight" [class.card--negativo]="saldoNegativo">
+        <div class="card-header">
+          <span class="card-label">Saldo Disponível</span>
+          <button class="visibility-btn" (click)="toggleSaldo()" [title]="saldoVisivel ? 'Ocultar saldo' : 'Mostrar saldo'">
+            <span class="material-icons">{{ saldoVisivel ? 'visibility' : 'visibility_off' }}</span>
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="saldo-valor" [class.saldo--negativo]="saldoNegativo">
+            <span *ngIf="saldoVisivel">
+              <span *ngIf="saldoNegativo" class="sinal-negativo">-</span>
+              {{ saldoAbsoluto | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+            </span>
+            <span *ngIf="!saldoVisivel" class="saldo-oculto">••••••••</span>
+          </div>
+          <div class="saldo-status" [class.status--negativo]="saldoNegativo">
+            <span class="material-icons status-icon">{{ saldoNegativo ? 'trending_down' : 'trending_up' }}</span>
+            <span>{{ saldoNegativo ? 'Saldo negativo' : 'Saldo positivo' }}</span>
+          </div>
+        </div>
+        <div class="card-decoration"></div>
+      </div>
+
+      <!-- Card Limite -->
+      <div class="card card--limite">
+        <div class="card-header">
+          <span class="card-label">Limite Disponível</span>
+          <span class="material-icons card-icon">credit_score</span>
+        </div>
+        <div class="card-body">
+          <div class="limite-valor">
+            <span *ngIf="saldoVisivel">{{ conta?.limite | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+            <span *ngIf="!saldoVisivel" class="saldo-oculto">••••••••</span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="percentualLimite"></div>
+            </div>
+            <span class="progress-label">{{ percentualLimite | number:'1.0-0' }}% utilizado</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Conta -->
+      <div class="card card--conta">
+        <div class="card-header">
+          <span class="card-label">Número da Conta</span>
+          <span class="material-icons card-icon">account_balance</span>
+        </div>
+        <div class="card-body">
+          <div class="conta-numero">{{ conta?.numeroConta }}</div>
+          <div class="conta-meta">
+            <span class="material-icons">calendar_today</span>
+            Aberta em {{ conta?.dataCriacao | date:'dd/MM/yyyy':'':'pt-BR' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Gerente -->
+      <div class="card card--gerente">
+        <div class="card-header">
+          <span class="card-label">Seu Gerente</span>
+          <span class="material-icons card-icon">support_agent</span>
+        </div>
+        <div class="card-body">
+          <div class="gerente-avatar">{{ gerenteIniciais }}</div>
+          <div class="gerente-info">
+            <span class="gerente-nome">{{ conta?.nomeGerente }}</span>
+            <span class="gerente-cargo">Gerente de Conta</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações Rápidas -->
+      <div class="card card--acoes card--full">
+        <div class="card-header">
+          <span class="card-label">Ações Rápidas</span>
+        </div>
+        <div class="acoes-grid">
+          <button class="acao-btn" (click)="navegarPara('deposito')">
+            <div class="acao-icon acao-icon--deposito">
+              <span class="material-icons">add_circle</span>
+            </div>
+            <span class="acao-label">Depositar</span>
+          </button>
+          <button class="acao-btn" (click)="navegarPara('saque')">
+            <div class="acao-icon acao-icon--saque">
+              <span class="material-icons">remove_circle</span>
+            </div>
+            <span class="acao-label">Sacar</span>
+          </button>
+          <button class="acao-btn" (click)="navegarPara('transferencia')">
+            <div class="acao-icon acao-icon--transferencia">
+              <span class="material-icons">swap_horiz</span>
+            </div>
+            <span class="acao-label">Transferir</span>
+          </button>
+          <button class="acao-btn" (click)="navegarPara('extrato')">
+            <div class="acao-icon acao-icon--extrato">
+              <span class="material-icons">receipt_long</span>
+            </div>
+            <span class="acao-label">Extrato</span>
+          </button>
+          <button class="acao-btn" (click)="navegarPara('perfil')">
+            <div class="acao-icon acao-icon--perfil">
+              <span class="material-icons">manage_accounts</span>
+            </div>
+            <span class="acao-label">Perfil</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
