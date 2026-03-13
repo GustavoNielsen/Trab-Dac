@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AutoCadastro } from './auto-cadastro';
+import { AutoCadastro } from '../../cliente/pages/auto-cadastro/auto-cadastro';
 
 describe('AutoCadastro', () => {
   let component: AutoCadastro;
