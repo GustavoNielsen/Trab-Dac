@@ -1,0 +1,124 @@
+<div class="container mt-5">
+
+    <h3 class="mb-4">Cadastro de Pessoa</h3>
+
+    <form #formCadastro="ngForm" (ngSubmit)="cadastrarUsuarioLocalStorage(formCadastro)">
+
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <label class="form-label">Nome Completo</label>
+                <input type="text" class="form-control" name="nome" #nome="ngModel" [(ngModel)]="cliente.nome" required>
+                <div class="error" *ngIf="nome.invalid && nome.touched">
+                    Nome é obrigatório.
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">CPF</label>
+                <input type="text" class="form-control" name="cpf" #cpf="ngModel" [(ngModel)]="cliente.cpf" required mask="000.000.000-00">
+                <div class="error" *ngIf="cpf.invalid && cpf.touched">
+                    CPF é obrigatório.
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">E-mail</label>
+                <input type="email" class="form-control" name="email" #email="ngModel" [(ngModel)]="cliente.email" email required>
+                <div class="error" *ngIf="email.invalid && email.touched">
+                    <span *ngIf="email.errors?.['required']">E-mail é obrigatório.</span>
+                    <span *ngIf="email.errors?.['email']">Formato de e-mail inválido.</span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Telefone</label>
+                <input type="text" class="form-control" name="telefone" #telefone="ngModel" [(ngModel)]="cliente.telefone" required mask="(00)0000-0000 || (00)00000-0000">
+                <div class="error" *ngIf="telefone.invalid && telefone.touched">
+                    Telefone é obrigatório.
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <h5 class="mb-3">Endereço</h5>
+
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label class="form-label">CEP</label>
+                <input type="text" class="form-control" name="cep" #cep="ngModel" [(ngModel)]="cliente.cep" required mask="00000-000" (blur)="consultaCEP()">
+                <div class="error" *ngIf="cep.invalid && cep.touched">
+                    CEP é obrigatório.
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <label class="form-label">Logradouro</label>
+                <input type="text" class="form-control" name="endereco" #endereco="ngModel" [(ngModel)]="cliente.endereco"  required>
+                <div class="error" *ngIf="endereco.invalid && endereco.touched">
+                    Endereço é obrigatório.
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Número</label>
+                <input type="text" class="form-control" name="numero" #numero="ngModel" [(ngModel)]="cliente.numero" required (keypress)="($event.charCode >= 48 && $event.charCode <= 57) ? true : $event.preventDefault()">
+                <div class="error" *ngIf="numero.invalid && numero.touched">
+                    Número é obrigatório.
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Complemento</label>
+                <input type="text" class="form-control" name="complemento" #complemento="ngModel" [(ngModel)]="cliente.complemento">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Bairro</label>
+                <input type="text" class="form-control" name="bairro" #bairro="ngModel" [(ngModel)]="cliente.bairro" required>
+                <div class="error" *ngIf="bairro.invalid && bairro.touched">
+                    Bairro é obrigatório.
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Cidade</label>
+                <input type="text" class="form-control" name="cidade" #cidade="ngModel" [(ngModel)]="cliente.cidade" required>
+                <div class="error" *ngIf="cidade.invalid && cidade.touched">
+                    Cidade é obrigatório.
+                </div>
+            </div>
+
+            <div class="col-md-1">
+                <label class="form-label">Estado</label>
+                <input type="text" class="form-control" name="uf" #uf="ngModel" [(ngModel)]="cliente.uf"  required>
+                <div class="error" *ngIf="uf.invalid && uf.touched">
+                    Estado é obrigatório.
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <label class="form-label">Salário</label>
+                <input type="text" class="form-control" name="salario" #salario="ngModel" [(ngModel)]="cliente.salario" required mask="separator.2" prefix="R$ " thousandSeparator="." decimalMarker=",">
+                <div class="error" *ngIf="salario.invalid && salario.touched">
+                    Salário é obrigatório.
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-outline-secondary">Cancelar</button>
+            <button type="submit" class="btn btn-primary" [disabled]="formCadastro.invalid">Salvar</button>
+            <button type="button" class="btn btn-primary" (click)="limparFormulario(formCadastro)">Limpar</button>
+        </div>
+
+    </form>
+</div>
