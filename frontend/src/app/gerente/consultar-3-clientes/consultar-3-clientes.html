@@ -1,0 +1,36 @@
+<div class="container mt-4">
+  <h2 class="mb-4 text-primary">Top 3 Clientes</h2>
+
+  <div *ngIf="melhores.length > 0; else semClientes">
+    <div class="row">
+      <div class="col-md-4" *ngFor="let cliente of melhores; let i = index">
+        <div class="card shadow-sm mb-3">
+          <div class="card-header bg-dark text-white">
+            🏆 {{ i + 1 }}º Lugar
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">{{ cliente.nome }}</h5>
+            <p class="card-text mb-1"><strong>CPF:</strong> {{ cliente.cpf }}</p>
+            <p class="card-text mb-1"><strong>Email:</strong> {{ cliente.email }}</p>
+            <p class="card-text mb-1"><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+            <p class="card-text mb-1"><strong>Cidade:</strong> {{ cliente.cidade }}</p>
+            <p class="card-text mb-1"><strong>Estado:</strong> {{ cliente.estado }}</p>
+            <p class="card-text mb-1"><strong>Conta:</strong> {{ cliente.conta }}</p>
+            <p class="card-text mb-1 text-success">
+              <strong>Saldo:</strong> R$ {{ cliente.saldo || 0 }}
+            </p>
+            <p class="card-text mb-1 text-primary">
+              <strong>Limite:</strong> R$ {{ cliente.limite || 0 }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #semClientes>
+    <div class="alert alert-warning">
+      Nenhum cliente disponível para ranking.
+    </div>
+  </ng-template>
+</div>
