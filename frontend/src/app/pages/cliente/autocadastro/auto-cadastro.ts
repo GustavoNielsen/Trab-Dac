@@ -1,11 +1,11 @@
 // src/app/autocadastro/autocadastro.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Cliente } from '../../shared/models/cliente.model';
+import { Cliente } from '../../../shared/models/cliente.model';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
-import { ClienteService } from '../../services/cliente-service';
+import { ClienteService } from '../../../services/cliente-service';
 import { provideNgxMask } from 'ngx-mask';
 import { HttpClientModule } from '@angular/common/http'; // Importar HttpClientModule
 

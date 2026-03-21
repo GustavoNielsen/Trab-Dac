@@ -12,9 +12,9 @@ export class ClienteService {
   private readonly VIA_CEP_URL = 'https://viacep.com.br/ws/';
   private readonly LOCAL_STORAGE_KEY = 'clientesTemp';
 
-  constructor(private http: HttpClient ) {} // Injetar HttpClient
+  constructor(private http: HttpClient ) {}
 
-  salvarClientesTempLocalStorage(cliente: Cliente): void {
+  salvarClientesLocalStorage(cliente: Cliente): void {
     let clientes: Cliente[] = this.getClientesTempLocalStorage();
     clientes.push(cliente);
     localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(clientes));
@@ -23,6 +23,11 @@ export class ClienteService {
   getClientesTempLocalStorage(): Cliente[] {
     const clientesJson = localStorage.getItem(this.LOCAL_STORAGE_KEY);
     return clientesJson ? JSON.parse(clientesJson) : [];
+  }
+
+  listarClientesLocalStorage(): any[] {
+    let retorno : any[] = []
+    return retorno
   }
 
   buscaCep(cep: string): Observable<any> {
