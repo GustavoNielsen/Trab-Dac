@@ -48,6 +48,7 @@ export class Cliente extends Pessoa {
     saldo: number;
     limite: number;
     papel: 'cliente' | 'gerente' | 'admin';
+    senha: string; // validar lógica
 
     constructor(
         cpf: string = '',
@@ -64,7 +65,8 @@ export class Cliente extends Pessoa {
         uf: string = '',
         saldo: number = 0,
         limite: number = 0,
-        papel: 'cliente' | 'gerente' | 'admin' = 'cliente'
+        papel: 'cliente' | 'gerente' | 'admin' = 'cliente',
+        senha: string = '' // validar lógica
     ) {
         super(cpf, nome, email, telefone); // Inicializa as propriedades de Pessoa
         this.salario = salario;
@@ -78,5 +80,6 @@ export class Cliente extends Pessoa {
         this.saldo = saldo;
         this.limite = limite;
         this.papel = papel;
+        this.senha = senha; // validar lógica
     }
 }

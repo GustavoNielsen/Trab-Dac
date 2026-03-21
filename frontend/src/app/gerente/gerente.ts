@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Cliente } from '../../../shared/models/cliente.model';
-import { ClienteService } from '../../../services/cliente-service';
+import { Cliente } from '../shared/models/cliente.model';
+import { ClienteService } from '../services/cliente-service';
 
 
 @Component({
@@ -38,7 +38,7 @@ aplicarLimite(){
 
 criarSenha(cliente: Cliente){
     cliente.senha = "tads";
-    this.clienteService.salvarClienteLocalStorage(cliente);
+    this.clienteService.salvarClientesLocalStorage(cliente);
   }
   
   aprovar(cliente: Cliente & { aprovado?: boolean, conta?: string, limite?: number }) {
@@ -56,28 +56,5 @@ criarSenha(cliente: Cliente){
 
     this.mensagem = `Cliente ${cliente.nome} aprovado! Conta: ${conta}, Limite: R$ ${limite.toFixed(2)}. Senha enviada por e-mail.`;
     this.sucesso = true;
-  }
-}
-
-import { Component, OnInit } from '@angular/core';
-import { Cliente } from '../../../shared/models/cliente.model';
-import { GerenteService } from '../../../services/gerente-service';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-@Component({
-  selector: 'app-consultar-3-clientes',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './consultar-3-clientes.html',
-  styleUrl: './consultar-3-clientes.css'
-})
-export class Consultar3Clientes implements OnInit {
-  melhores: Cliente[] = [];
-
-  constructor(private gerenteService: GerenteService) {}
-
-  ngOnInit() {
-    this.melhores = this.gerenteService.consultar3MelhoresClientes();
   }
 }
