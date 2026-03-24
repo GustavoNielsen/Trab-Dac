@@ -25,7 +25,7 @@ export class Deposito implements OnInit {
 
   conta: any = null;
 
-  constructor(private router: Router) {}
+  constructor(public router: Router) {}
 
   ngOnInit(): void {
     // TODO: carregar dados reais da conta

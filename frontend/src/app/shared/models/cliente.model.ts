@@ -47,6 +47,7 @@ export class Cliente extends Pessoa {
     uf: string;
     saldo: number;
     limite: number;
+    conta?: string;
     papel: 'cliente' | 'gerente' | 'admin';
     senha: string; // validar lógica
 

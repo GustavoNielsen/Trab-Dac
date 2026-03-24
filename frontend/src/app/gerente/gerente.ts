@@ -7,9 +7,25 @@ import { ClienteService } from '../services/cliente-service';
 
 @Component({
   selector: 'app-aprovar-cliente',
+  standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './aprovar-cliente.html',
-  styleUrl: './aprovar-cliente.css'
+  template: `
+    <div class="container py-4">
+      <h2>Aprovar Cliente</h2>
+      <p *ngIf="clientesTemp.length === 0">Nenhum cliente pendente para aprovação.</p>
+      <div *ngFor="let cliente of clientesTemp" class="card mb-2">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ cliente.nome }}</strong> - {{ cliente.cpf }}
+          </div>
+          <button class="btn btn-primary btn-sm" (click)="aprovar(cliente)">Aprovar</button>
+        </div>
+      </div>
+      <div *ngIf="mensagem" class="alert mt-3" [class.alert-success]="sucesso" [class.alert-warning]="!sucesso">
+        {{ mensagem }}
+      </div>
+    </div>
+  `,
 })
 export class AprovarCliente {
 clientesTemp: any[] = [];
@@ -23,9 +39,9 @@ constructor(private clienteService: ClienteService) {
   }
 
 calcularLimite(cliente: Cliente) {
-  if(cliente.salario <= 2000.00){
-    cliente.limite = cliente.salario/2;
-  }else {
+  if (cliente.salario >= 2000.0) {
+    cliente.limite = cliente.salario / 2;
+  } else {
     cliente.limite = 0.0;
   }
 }

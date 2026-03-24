@@ -20,14 +20,17 @@ export class ClienteService {
     localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(clientes));
   }
 
+  salvarClientesTempLocalStorage(cliente: Cliente): void {
+    this.salvarClientesLocalStorage(cliente);
+  }
+
   getClientesTempLocalStorage(): Cliente[] {
     const clientesJson = localStorage.getItem(this.LOCAL_STORAGE_KEY);
     return clientesJson ? JSON.parse(clientesJson) : [];
   }
 
   listarClientesLocalStorage(): any[] {
-    let retorno : any[] = []
-    return retorno
+    return this.getClientesTempLocalStorage();
   }
 
   buscaCep(cep: string): Observable<any> {
