@@ -13,6 +13,7 @@ export const routes: Routes = [
     { path: 'cliente', component: TelaInicialCliente },
     { path: 'deposito', component: Deposito },
     { path: 'cliente/deposito', component: Deposito },
+    { path: 'cliente/saque', component: Saque }, 
 
     // Gerente
     { path: 'gerente/aprovar', component: AprovarCliente },

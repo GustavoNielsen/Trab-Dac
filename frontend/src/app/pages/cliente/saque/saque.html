@@ -1,0 +1,254 @@
+<div class="dashboard-wrapper">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="8" fill="#1a3a5c"/>
+          <path d="M6 18L10 10L14 15L18 8L22 18H6Z" fill="#4fc3f7" opacity="0.9"/>
+          <circle cx="14" cy="20" r="2" fill="#4fc3f7"/>
+        </svg>
+        <span class="brand-name">BANTADS</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">CONTA</span>
+
+      <a class="nav-item" (click)="voltar()">
+        <span class="material-icons">home</span>
+        <span class="nav-label">Início</span>
+      </a>
+      <a class="nav-item" (click)="router.navigate(['/cliente/deposito'])">
+        <span class="material-icons">add_circle_outline</span>
+        <span class="nav-label">Depositar</span>
+      </a>
+      <a class="nav-item nav-item--active">
+        <span class="material-icons">remove_circle_outline</span>
+        <span class="nav-label">Sacar</span>
+      </a>
+      <a class="nav-item" (click)="router.navigate(['/cliente/transferencia'])">
+        <span class="material-icons">swap_horiz</span>
+        <span class="nav-label">Transferência</span>
+      </a>
+      <a class="nav-item" (click)="router.navigate(['/cliente/extrato'])">
+        <span class="material-icons">receipt_long</span>
+        <span class="nav-label">Extrato</span>
+      </a>
+
+      <hr class="nav-divider">
+      <span class="nav-section-label">PERFIL</span>
+
+      <a class="nav-item" (click)="router.navigate(['/cliente/perfil'])">
+        <span class="material-icons">manage_accounts</span>
+        <span class="nav-label">Meu Perfil</span>
+      </a>
+      <a class="nav-item nav-item--danger" (click)="router.navigate(['/login'])">
+        <span class="material-icons">logout</span>
+        <span class="nav-label">Sair</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ===================== CONTEÚDO ===================== -->
+  <main class="main-content">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div>
+        <h4 class="mb-0">
+          <span class="material-icons align-middle me-2 text-danger">remove_circle</span>
+          Saque
+        </h4>
+        <small class="text-muted">Retire saldo da sua conta</small>
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div class="d-flex justify-content-center align-items-center flex-column gap-3 py-5"
+         *ngIf="carregando">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+      <span class="text-muted">Carregando dados da conta...</span>
+    </div>
+
+    <div class="page-body" *ngIf="!carregando">
+
+      <!-- ── Resumo da conta ── -->
+      <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <p class="text-muted small mb-1 text-uppercase fw-semibold">Saldo Atual</p>
+              <h5 class="mb-0"
+                  [class.text-danger]="saldoNegativo"
+                  [class.text-dark]="!saldoNegativo">
+                <span *ngIf="saldoNegativo">- </span>
+                {{ (conta?.saldo ?? 0) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <p class="text-muted small mb-1 text-uppercase fw-semibold">Limite</p>
+              <h5 class="mb-0">
+                {{ (conta?.limite ?? 0) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <p class="text-muted small mb-1 text-uppercase fw-semibold">Disponível para Saque</p>
+              <h5 class="mb-0 text-primary">
+                {{ saldoDisponivel | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </h5>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Alerta de erro ── -->
+      <div class="alert alert-danger alert-dismissible d-flex align-items-center gap-2"
+           role="alert"
+           *ngIf="erro">
+        <span class="material-icons">error_outline</span>
+        <span>{{ erro }}</span>
+        <button type="button" class="btn-close" (click)="erro = ''" aria-label="Fechar"></button>
+      </div>
+
+      <!-- ── Formulário de saque ── -->
+      <div class="card border-0 shadow-sm" *ngIf="!sucesso">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="mb-0 d-flex align-items-center gap-2">
+            <span class="material-icons text-danger">payments</span>
+            Realizar Saque
+          </h5>
+        </div>
+
+        <div class="card-body p-4">
+          <form #formSaque="ngForm" (ngSubmit)="confirmar(formSaque)" novalidate>
+
+            <div class="row">
+              <div class="col-md-5">
+                <label class="form-label fw-semibold" for="valorSaque">
+                  Valor do Saque <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">R$</span>
+                  <input
+                    id="valorSaque"
+                    type="text"
+                    class="form-control form-control-lg"
+                    name="valor"
+                    [(ngModel)]="valorStr"
+                    #valorCtrl="ngModel"
+                    required
+                    placeholder="0,00"
+                    [class.is-invalid]="valorCtrl.invalid && valorCtrl.touched"
+                    (focus)="erro = ''"
+                  />
+                  <div class="invalid-feedback">
+                    Informe um valor válido.
+                  </div>
+                </div>
+                <div class="form-text">
+                  Saldo disponível (incluindo limite):
+                  <strong>{{ saldoDisponivel | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Aviso de limite -->
+            <div class="alert alert-warning d-flex align-items-center gap-2 mt-3"
+                 *ngIf="(conta?.saldo ?? 0) < 0">
+              <span class="material-icons">warning_amber</span>
+              <span>Sua conta está com saldo negativo. O saque só é permitido dentro do limite disponível.</span>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex justify-content-end gap-2">
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="voltar()"
+                [disabled]="enviando">
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-danger px-4"
+                [disabled]="enviando || formSaque.invalid">
+                <span class="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      *ngIf="enviando"></span>
+                <span class="material-icons align-middle me-1" *ngIf="!enviando">check_circle</span>
+                {{ enviando ? 'Processando...' : 'Confirmar Saque' }}
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+      <!-- ── Card de sucesso ── -->
+      <div class="card border-0 shadow-sm border-danger" *ngIf="sucesso">
+        <div class="card-body p-4 text-center">
+
+          <div class="mb-3">
+            <span class="material-icons text-danger" style="font-size: 56px;">check_circle</span>
+          </div>
+
+          <h4 class="fw-bold mb-1">Saque realizado com sucesso!</h4>
+          <p class="text-muted mb-4">O valor foi debitado da sua conta.</p>
+
+          <div class="table-responsive mx-auto" style="max-width: 400px;">
+            <table class="table table-bordered table-sm text-start">
+              <tbody>
+                <tr>
+                  <th class="text-muted fw-normal" scope="row">Valor sacado</th>
+                  <td class="text-danger fw-bold">
+                    - {{ valorConfirmado | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-muted fw-normal" scope="row">Novo saldo</th>
+                  <td class="fw-bold" [class.text-danger]="novoSaldo < 0">
+                    {{ novoSaldo | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+                  </td>
+                </tr>
+                <tr>
+                  <th class="text-muted fw-normal" scope="row">Data / Hora</th>
+                  <td>{{ dataHora | date:'dd/MM/yyyy HH:mm':'':'pt-BR' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-center gap-2 mt-3">
+            <button class="btn btn-outline-danger" (click)="novoSaque()">
+              <span class="material-icons align-middle me-1">remove_circle_outline</span>
+              Novo Saque
+            </button>
+            <button class="btn btn-primary" (click)="voltar()">
+              <span class="material-icons align-middle me-1">home</span>
+              Voltar ao Início
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /page-body -->
+  </main>
+</div>
