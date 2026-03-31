@@ -29,7 +29,7 @@ export class Saque implements OnInit {
   // URL base do API Gateway — ajuste se necessário
   private readonly API = 'http://localhost:3000';
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(public router: Router, private http: HttpClient) {}
 
   ngOnInit(): void {
     this.carregarConta();

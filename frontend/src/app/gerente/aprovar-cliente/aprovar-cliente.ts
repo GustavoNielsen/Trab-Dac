@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Cliente } from '../../../shared/models/cliente.model';
-import { ClienteService } from '../../../services/cliente-service';
+import { Cliente } from '../../shared/models/cliente.model';
+import { ClienteService } from '../../services/cliente-service';
 
 
 @Component({
   selector: 'app-aprovar-cliente',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './aprovar-cliente.html',
   styleUrl: './aprovar-cliente.css'
@@ -23,9 +24,9 @@ constructor(private clienteService: ClienteService) {
   }
 
 calcularLimite(cliente: Cliente) {
-  if(cliente.salario <= 2000.00){
-    cliente.limite = cliente.salario/2;
-  }else {
+  if (cliente.salario >= 2000.0) {
+    cliente.limite = cliente.salario / 2;
+  } else {
     cliente.limite = 0.0;
   }
 }
@@ -38,7 +39,7 @@ aplicarLimite(){
 
 criarSenha(cliente: Cliente){
     cliente.senha = "tads";
-    this.clienteService.salvarClienteLocalStorage(cliente);
+    this.clienteService.salvarClientesLocalStorage(cliente);
   }
   
   aprovar(cliente: Cliente & { aprovado?: boolean, conta?: string, limite?: number }) {

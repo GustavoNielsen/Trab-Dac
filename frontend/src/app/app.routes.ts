@@ -2,7 +2,8 @@ import { Routes } from '@angular/router';
 import { Autocadastro } from './pages/cliente/autocadastro/auto-cadastro';
 import { TelaInicialCliente } from './pages/cliente/tela-inicial-cliente/tela-inicial-cliente';
 import { Deposito } from './pages/cliente/deposito/deposito';
-import { AprovarCliente } from './gerente/gerente';
+import { Saque } from './pages/cliente/saque/saque';
+import { AprovarCliente } from './gerente/aprovar-cliente/aprovar-cliente';
 import { Consultar3Clientes } from './gerente/consultar-3-clientes/consultar-3-clientes';
 
 export const routes: Routes = [

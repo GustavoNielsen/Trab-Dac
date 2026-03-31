@@ -1,124 +1,134 @@
-<div class="container mt-5">
+<div class="cadastro-page">
+  <div class="cadastro-bg" aria-hidden="true"></div>
 
-    <h3 class="mb-4">Cadastro de Pessoa</h3>
+  <div class="cadastro-shell">
+    <header class="cadastro-brand">
+      <div class="logo-mark">
+        <svg width="40" height="40" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <rect width="28" height="28" rx="8" fill="#1a3a5c"/>
+          <path d="M6 18L10 10L14 15L18 8L22 18H6Z" fill="#4fc3f7" opacity="0.9"/>
+          <circle cx="14" cy="20" r="2" fill="#4fc3f7"/>
+        </svg>
+      </div>
+      <h1 class="brand-title">BANTADS</h1>
+      <p class="brand-tagline">Abra sua conta</p>
+    </header>
 
-    <form #formCadastro="ngForm" (ngSubmit)="cadastrarUsuarioLocalStorage(formCadastro)">
+    <section class="cadastro-panel">
+      <h2 class="panel-title">Autocadastro</h2>
+      <p class="panel-sub">
+        Preencha seus dados. Após o envio, sua solicitação segue para análise de um gerente.
+      </p>
 
-        <div class="row mb-3">
-            <div class="col-md-8">
-                <label class="form-label">Nome Completo</label>
-                <input type="text" class="form-control" name="nome" #nome="ngModel" [(ngModel)]="cliente.nome" required>
-                <div class="error" *ngIf="nome.invalid && nome.touched">
-                    Nome é obrigatório.
-                </div>
-            </div>
+      <form #formCadastro="ngForm" (ngSubmit)="cadastrarUsuarioLocalStorage(formCadastro)" novalidate>
+        <h3 class="section-title">
+          <span class="material-icons">badge</span>
+          Dados pessoais
+        </h3>
 
-            <div class="col-md-4">
-                <label class="form-label">CPF</label>
-                <input type="text" class="form-control" name="cpf" #cpf="ngModel" [(ngModel)]="cliente.cpf" required mask="000.000.000-00">
-                <div class="error" *ngIf="cpf.invalid && cpf.touched">
-                    CPF é obrigatório.
-                </div>
-            </div>
+        <div class="form-grid form-grid--2-1">
+          <div class="field">
+            <label for="nome">Nome completo <span class="req">*</span></label>
+            <input id="nome" type="text" name="nome" #nome="ngModel" [(ngModel)]="cliente.nome" required
+                   class="ac-input" placeholder="Seu nome completo">
+            <span class="field-err" *ngIf="nome.invalid && nome.touched">Nome é obrigatório.</span>
+          </div>
+          <div class="field">
+            <label for="cpf">CPF <span class="req">*</span></label>
+            <input id="cpf" type="text" name="cpf" #cpf="ngModel" [(ngModel)]="cliente.cpf" required
+                   mask="000.000.000-00" class="ac-input" placeholder="000.000.000-00">
+            <span class="field-err" *ngIf="cpf.invalid && cpf.touched">CPF é obrigatório.</span>
+          </div>
         </div>
 
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">E-mail</label>
-                <input type="email" class="form-control" name="email" #email="ngModel" [(ngModel)]="cliente.email" email required>
-                <div class="error" *ngIf="email.invalid && email.touched">
-                    <span *ngIf="email.errors?.['required']">E-mail é obrigatório.</span>
-                    <span *ngIf="email.errors?.['email']">Formato de e-mail inválido.</span>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label">Telefone</label>
-                <input type="text" class="form-control" name="telefone" #telefone="ngModel" [(ngModel)]="cliente.telefone" required mask="(00)0000-0000 || (00)00000-0000">
-                <div class="error" *ngIf="telefone.invalid && telefone.touched">
-                    Telefone é obrigatório.
-                </div>
-            </div>
+        <div class="form-grid form-grid--1-1">
+          <div class="field">
+            <label for="email">E-mail <span class="req">*</span></label>
+            <input id="email" type="email" name="email" #email="ngModel" [(ngModel)]="cliente.email" email required
+                   class="ac-input" placeholder="nome@email.com">
+            <span class="field-err" *ngIf="email.invalid && email.touched">
+              <ng-container *ngIf="email.errors?.['required']">E-mail é obrigatório.</ng-container>
+              <ng-container *ngIf="email.errors?.['email']">Formato de e-mail inválido.</ng-container>
+            </span>
+          </div>
+          <div class="field">
+            <label for="telefone">Telefone <span class="req">*</span></label>
+            <input id="telefone" type="text" name="telefone" #telefone="ngModel" [(ngModel)]="cliente.telefone" required
+                   mask="(00)0000-0000 || (00)00000-0000" class="ac-input" placeholder="(00) 00000-0000">
+            <span class="field-err" *ngIf="telefone.invalid && telefone.touched">Telefone é obrigatório.</span>
+          </div>
         </div>
 
-        <hr class="my-4">
+        <hr class="sep">
 
-        <h5 class="mb-3">Endereço</h5>
+        <h3 class="section-title">
+          <span class="material-icons">place</span>
+          Endereço
+        </h3>
 
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <label class="form-label">CEP</label>
-                <input type="text" class="form-control" name="cep" #cep="ngModel" [(ngModel)]="cliente.cep" required mask="00000-000" (blur)="consultaCEP()">
-                <div class="error" *ngIf="cep.invalid && cep.touched">
-                    CEP é obrigatório.
-                </div>
-            </div>
-
-            <div class="col-md-7">
-                <label class="form-label">Logradouro</label>
-                <input type="text" class="form-control" name="endereco" #endereco="ngModel" [(ngModel)]="cliente.endereco" required>
-                <div class="error" *ngIf="endereco.invalid && endereco.touched">
-                    Endereço é obrigatório.
-                </div>
-            </div>
-
-            <div class="col-md-2">
-                <label class="form-label">Número</label>
-                <input type="text" class="form-control" name="numero" #numero="ngModel" [(ngModel)]="cliente.numero" required (keypress)="($event.charCode >= 48 && $event.charCode <= 57) ? true : $event.preventDefault()">
-                <div class="error" *ngIf="numero.invalid && numero.touched">
-                    Número é obrigatório.
-                </div>
-            </div>
+        <div class="form-grid form-grid--cep">
+          <div class="field">
+            <label for="cep">CEP <span class="req">*</span></label>
+            <input id="cep" type="text" name="cep" #cep="ngModel" [(ngModel)]="cliente.cep" required
+                   mask="00000-000" (blur)="consultaCEP()" class="ac-input" placeholder="00000-000">
+            <span class="field-err" *ngIf="cep.invalid && cep.touched">CEP é obrigatório.</span>
+          </div>
+          <div class="field field--grow">
+            <label for="endereco">Logradouro <span class="req">*</span></label>
+            <input id="endereco" type="text" name="endereco" #endereco="ngModel" [(ngModel)]="cliente.endereco" required
+                   class="ac-input" placeholder="Rua, avenida...">
+            <span class="field-err" *ngIf="endereco.invalid && endereco.touched">Endereço é obrigatório.</span>
+          </div>
+          <div class="field field--num">
+            <label for="numero">Nº <span class="req">*</span></label>
+            <input id="numero" type="text" name="numero" #numero="ngModel" [(ngModel)]="cliente.numero" required
+                   class="ac-input"
+                   (keypress)="($event.charCode >= 48 && $event.charCode <= 57) ? true : $event.preventDefault()">
+            <span class="field-err" *ngIf="numero.invalid && numero.touched">Obrigatório.</span>
+          </div>
         </div>
 
-        <div class="row mb-3">
-            <div class="col-md-4">
-                <label class="form-label">Complemento</label>
-                <input type="text" class="form-control" name="complemento" #complemento="ngModel" [(ngModel)]="cliente.complemento">
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label">Bairro</label>
-                <input type="text" class="form-control" name="bairro" #bairro="ngModel" [(ngModel)]="cliente.bairro" required>
-                <div class="error" *ngIf="bairro.invalid && bairro.touched">
-                    Bairro é obrigatório.
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label">Cidade</label>
-                <input type="text" class="form-control" name="cidade" #cidade="ngModel" [(ngModel)]="cliente.cidade" required>
-                <div class="error" *ngIf="cidade.invalid && cidade.touched">
-                    Cidade é obrigatório.
-                </div>
-            </div>
-
-            <div class="col-md-1">
-                <label class="form-label">Estado</label>
-                <input type="text" class="form-control" name="uf" #uf="ngModel" [(ngModel)]="cliente.uf"  required>
-                <div class="error" *ngIf="uf.invalid && uf.touched">
-                    Estado é obrigatório.
-                </div>
-            </div>
+        <div class="form-grid form-grid--4col">
+          <div class="field">
+            <label for="complemento">Complemento</label>
+            <input id="complemento" type="text" name="complemento" #complemento="ngModel" [(ngModel)]="cliente.complemento"
+                   class="ac-input" placeholder="Apto, bloco...">
+          </div>
+          <div class="field">
+            <label for="bairro">Bairro <span class="req">*</span></label>
+            <input id="bairro" type="text" name="bairro" #bairro="ngModel" [(ngModel)]="cliente.bairro" required class="ac-input">
+            <span class="field-err" *ngIf="bairro.invalid && bairro.touched">Bairro é obrigatório.</span>
+          </div>
+          <div class="field">
+            <label for="cidade">Cidade <span class="req">*</span></label>
+            <input id="cidade" type="text" name="cidade" #cidade="ngModel" [(ngModel)]="cliente.cidade" required class="ac-input">
+            <span class="field-err" *ngIf="cidade.invalid && cidade.touched">Cidade é obrigatória.</span>
+          </div>
+          <div class="field field--uf">
+            <label for="uf">UF <span class="req">*</span></label>
+            <input id="uf" type="text" name="uf" #uf="ngModel" [(ngModel)]="cliente.uf" required maxlength="2" class="ac-input" placeholder="PR">
+            <span class="field-err" *ngIf="uf.invalid && uf.touched">UF é obrigatória.</span>
+          </div>
         </div>
 
-        <hr class="my-4">
+        <hr class="sep">
 
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <label class="form-label">Salário</label>
-                <input type="text" class="form-control" name="salario" #salario="ngModel" [(ngModel)]="cliente.salario" required mask="separator.2" prefix="R$ " thousandSeparator="." decimalMarker=",">
-                <div class="error" *ngIf="salario.invalid && salario.touched">
-                    Salário é obrigatório.
-                </div>
-            </div>
+        <div class="field field--salario">
+          <label for="salario">Salário mensal <span class="req">*</span></label>
+          <input id="salario" type="text" name="salario" #salario="ngModel" [(ngModel)]="cliente.salario" required
+                 mask="separator.2" prefix="R$ " thousandSeparator="." decimalMarker="," class="ac-input">
+          <span class="field-err" *ngIf="salario.invalid && salario.touched">Salário é obrigatório.</span>
+          <p class="hint">Usado para calcular seu limite de crédito após aprovação.</p>
         </div>
 
-        <div class="d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-outline-secondary">Cancelar</button>
-            <button type="submit" class="btn btn-primary" [disabled]="formCadastro.invalid">Salvar</button>
-            <button type="button" class="btn btn-primary" (click)="limparFormulario(formCadastro)">Limpar</button>
+        <div class="actions">
+          <button type="button" class="ac-btn ac-btn--ghost" (click)="limparFormulario(formCadastro)">Limpar</button>
+          <button type="submit" class="ac-btn ac-btn--primary" [disabled]="formCadastro.invalid">
+            <span class="material-icons ac-btn-ico">send</span>
+            Enviar solicitação
+          </button>
         </div>
-
-    </form>
+      </form>
+    </section>
+  </div>
 </div>
