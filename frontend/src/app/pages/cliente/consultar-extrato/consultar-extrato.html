@@ -1,0 +1,70 @@
+<div class="container mt-4">
+  <h2 class="mb-4">Consulta de Extrato</h2>
+
+  <div class="card mb-4 p-3">
+    <form class="row g-3">
+      <div class="col-md-4">
+        <label for="dataInicio" class="form-label">Data de Início</label>
+        <input type="date" class="form-control" id="dataInicio" name="dataInicio" required>
+      </div>
+      <div class="col-md-4">
+        <label for="dataFim" class="form-label">Data de Fim</label>
+        <input type="date" class="form-control" id="dataFim" name="dataFim" required>
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Consultar</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="mb-3">
+    <h4>Saldo Atual: 
+      <span class="text-primary">R$ 1.500,00</span> 
+    </h4>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th>Data/Hora</th>
+          <th>Operação</th>
+          <th>Origem/Destino</th>
+          <th>Valor (R$)</th>
+          <th>Saldo Consolidado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="text-primary">
+          <td>01/03/2026 10:00</td>
+          <td>Depósito</td>
+          <td>-</td>
+          <td>500,00</td>
+          <td>2.000,00</td>
+        </tr>
+
+        <tr class="text-danger">
+          <td>02/03/2026 14:30</td>
+          <td>Transferência</td>
+          <td>João Silva (CPF: 123...)</td>
+          <td>-200,00</td>
+          <td>1.800,00</td>
+        </tr>
+
+        <tr class="text-danger">
+          <td>02/03/2026 16:00</td>
+          <td>Saque</td>
+          <td>-</td>
+          <td>-300,00</td>
+          <td>1.500,00</td>
+        </tr>
+      </tbody>
+      <tfoot class="table-light">
+        <tr>
+          <td colspan="4" class="text-end"><strong>Saldo Consolidado do Dia:</strong></td>
+          <td><strong>R$ 1.500,00</strong></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
