@@ -1,0 +1,77 @@
+<div class="container mt-4">
+  <h2 class="mb-4 text-primary">Consultar Cliente</h2>
+
+  <div class="card p-3 shadow-sm mb-3">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <input
+          name="cpf"
+          [(ngModel)]="cpf"
+          type="text"
+          class="form-control"
+          placeholder="Digite o CPF (com ou sem máscara)" />
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-primary w-100" (click)="consultar()">
+          Buscar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensagem caso não encontre -->
+  <div *ngIf="!cliente && cpf" class="alert alert-warning mt-3">
+    Nenhum cliente encontrado para o CPF informado.
+  </div>
+
+  <!-- Dados do cliente -->
+  <div *ngIf="cliente" class="card shadow-sm p-3">
+    <h3 class="text-success mb-3">Dados do Cliente</h3>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item"><strong>CPF:</strong> {{ cliente.cpf }}</li>
+      <li class="list-group-item"><strong>Nome:</strong> {{ cliente.nome }}</li>
+      <li class="list-group-item"><strong>Email:</strong> {{ cliente.email }}</li>
+      <li class="list-group-item"><strong>Telefone:</strong> {{ cliente.telefone }}</li>
+      <li class="list-group-item"><strong>Cidade:</strong> {{ cliente.cidade }}</li>
+      <li class="list-group-item"><strong>Estado:</strong> {{ cliente.uf }}</li>
+      <li class="list-group-item"><strong>Conta:</strong> {{ cliente.conta || '—' }}</li>
+      <li class="list-group-item">
+        <strong>Saldo:</strong> R$ {{ (cliente.saldo || 0) | number:'1.2-2' }}
+      </li>
+      <li class="list-group-item">
+        <strong>Limite:</strong> R$ {{ (cliente.limite || 0) | number:'1.2-2' }}
+      </li>
+    </ul>
+
+    <div class="mt-3">
+      <button
+        class="btn btn-outline-primary"
+        (click)="verDetalhamento(cliente)"
+        [disabled]="!cliente?.conta">
+        Ver Detalhamento
+      </button>
+
+      <small class="text-muted ms-2" *ngIf="!cliente?.conta">
+        Cliente ainda não possui conta (ainda não aprovado).
+      </small>
+    </div>
+
+    <!-- Extrato -->
+    <div *ngIf="extrato && extrato.length > 0" class="mt-3">
+      <h5>Extrato detalhado</h5>
+      <div *ngFor="let dia of extrato" class="border p-2 mb-2">
+        <strong>{{ dia.data | date: 'dd/MM/yyyy' }}</strong> -
+        Saldo: R$ {{ dia.saldo | number:'1.2-2' }}
+        <ul class="mt-2">
+          <li *ngFor="let mov of dia.movimentos">
+            {{ mov.tipo }} - R$ {{ mov.valor | number:'1.2-2' }} ({{ mov.dataHora | date: 'HH:mm' }})
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div *ngIf="extrato && extrato.length === 0 && cliente?.conta" class="alert alert-info mt-3">
+      Não há movimentações no período selecionado.
+    </div>
+  </div>
+</div>
