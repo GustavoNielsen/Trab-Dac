@@ -52,7 +52,8 @@ export class TelaInicialCliente implements OnInit {
   }
 
   navegarPara(rota: string): void {
-    this.router.navigate([rota]);
+    const segments = rota.split('/').filter((s) => s.length > 0);
+    this.router.navigate(segments);
   }
 
   logout(): void {

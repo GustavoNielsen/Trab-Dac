@@ -1,0 +1,159 @@
+<div class="dashboard-wrapper">
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="8" fill="#1a3a5c"/>
+          <path d="M6 18L10 10L14 15L18 8L22 18H6Z" fill="#4fc3f7" opacity="0.9"/>
+          <circle cx="14" cy="20" r="2" fill="#4fc3f7"/>
+        </svg>
+        <span class="brand-name">BANTADS</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">CONTA</span>
+
+      <a class="nav-item" (click)="voltar()">
+        <span class="material-icons">home</span>
+        <span class="nav-label">Início</span>
+      </a>
+      <a class="nav-item" (click)="router.navigate(['/cliente/deposito'])">
+        <span class="material-icons">add_circle_outline</span>
+        <span class="nav-label">Depositar</span>
+      </a>
+      <a class="nav-item" (click)="router.navigate(['/cliente/saque'])">
+        <span class="material-icons">remove_circle_outline</span>
+        <span class="nav-label">Sacar</span>
+      </a>
+      <a class="nav-item" (click)="router.navigate(['/cliente/transferencia'])">
+        <span class="material-icons">swap_horiz</span>
+        <span class="nav-label">Transferência</span>
+      </a>
+      <a class="nav-item nav-item--active">
+        <span class="material-icons">receipt_long</span>
+        <span class="nav-label">Extrato</span>
+      </a>
+
+      <hr class="nav-divider">
+      <span class="nav-section-label">PERFIL</span>
+
+      <a class="nav-item" (click)="router.navigate(['/cliente/perfil'])">
+        <span class="material-icons">manage_accounts</span>
+        <span class="nav-label">Meu Perfil</span>
+      </a>
+      <a class="nav-item nav-item--danger" (click)="router.navigate(['/cadastro'])">
+        <span class="material-icons">logout</span>
+        <span class="nav-label">Sair</span>
+      </a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="topbar">
+      <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 w-100">
+        <div>
+          <h4 class="mb-0">
+            <span class="material-icons align-middle me-2 text-secondary">receipt_long</span>
+            Extrato
+          </h4>
+          <small class="text-muted">Movimentações da conta {{ conta?.numeroConta ?? '—' }}</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label class="form-label mb-0 small text-muted" for="mes">Mês</label>
+          <input
+            id="mes"
+            type="month"
+            class="form-control form-control-sm"
+            style="width: auto; min-width: 160px;"
+            [(ngModel)]="mesFiltro"
+            name="mesFiltro"
+          />
+        </div>
+      </div>
+    </header>
+
+    <div class="d-flex justify-content-center align-items-center flex-column gap-3 py-5" *ngIf="carregando()">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+      <span class="text-muted">Carregando extrato...</span>
+    </div>
+
+    <div class="page-body" *ngIf="!carregando()">
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <p class="text-muted small mb-1 text-uppercase fw-semibold">Saldo atual</p>
+              <h5 class="mb-0" [class.text-danger]="saldoNegativo" [class.text-dark]="!saldoNegativo">
+                <span *ngIf="saldoNegativo">- </span>
+                {{ (conta?.saldo ?? 0) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <p class="text-muted small mb-1 text-uppercase fw-semibold">Limite</p>
+              <h5 class="mb-0">{{ (conta?.limite ?? 0) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <p class="text-muted small mb-1 text-uppercase fw-semibold">Lançamentos no período</p>
+              <h5 class="mb-0 text-primary">{{ linhasFiltradas.length }}</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm extrato-card">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 extrato-table">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Data</th>
+                  <th scope="col">Tipo</th>
+                  <th scope="col">Descrição</th>
+                  <th scope="col" class="text-end">Valor</th>
+                  <th scope="col" class="text-end">Saldo após</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let m of linhasFiltradas">
+                  <td class="text-nowrap">{{ m.data | date:'dd/MM/yyyy HH:mm':'':'pt-BR' }}</td>
+                  <td>
+                    <span class="badge rounded-pill bg-light text-dark border">{{ labelTipo(m.tipo) }}</span>
+                  </td>
+                  <td>{{ m.descricao }}</td>
+                  <td class="text-end fw-semibold" [ngClass]="classeValor(m.valor)">
+                    <span *ngIf="m.valor > 0">+</span>{{ m.valor | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+                  </td>
+                  <td class="text-end">{{ m.saldoApos | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</td>
+                </tr>
+                <tr *ngIf="linhasFiltradas.length === 0">
+                  <td colspan="5" class="text-center text-muted py-5">
+                    Nenhuma movimentação neste mês.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <p class="small text-muted mt-3 mb-0">
+        Os dados exibidos são exemplos quando o backend não está disponível.
+      </p>
+
+    </div>
+  </main>
+</div>

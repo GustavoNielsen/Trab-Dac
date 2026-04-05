@@ -29,15 +29,15 @@
         <span class="material-icons">add_circle_outline</span>
         <span class="nav-label" *ngIf="!sidebarCollapsed">Depositar</span>
       </a>
-      <a class="nav-item" (click)="navegarPara('saque')" title="Sacar">
+      <a class="nav-item" (click)="navegarPara('cliente/saque')" title="Sacar">
         <span class="material-icons">remove_circle_outline</span>
         <span class="nav-label" *ngIf="!sidebarCollapsed">Sacar</span>
       </a>
-      <a class="nav-item" (click)="navegarPara('transferencia')" title="Transferência">
+      <a class="nav-item" (click)="navegarPara('cliente/transferencia')" title="Transferência">
         <span class="material-icons">swap_horiz</span>
         <span class="nav-label" *ngIf="!sidebarCollapsed">Transferência</span>
       </a>
-      <a class="nav-item" (click)="navegarPara('extrato')" title="Extrato">
+      <a class="nav-item" (click)="navegarPara('cliente/extrato')" title="Extrato">
         <span class="material-icons">receipt_long</span>
         <span class="nav-label" *ngIf="!sidebarCollapsed">Extrato</span>
       </a>
@@ -177,19 +177,19 @@
             </div>
             <span class="acao-label">Depositar</span>
           </button>
-          <button class="acao-btn" (click)="navegarPara('saque')">
+          <button class="acao-btn" (click)="navegarPara('cliente/saque')">
             <div class="acao-icon acao-icon--saque">
               <span class="material-icons">remove_circle</span>
             </div>
             <span class="acao-label">Sacar</span>
           </button>
-          <button class="acao-btn" (click)="navegarPara('transferencia')">
+          <button class="acao-btn" (click)="navegarPara('cliente/transferencia')">
             <div class="acao-icon acao-icon--transferencia">
               <span class="material-icons">swap_horiz</span>
             </div>
             <span class="acao-label">Transferir</span>
           </button>
-          <button class="acao-btn" (click)="navegarPara('extrato')">
+          <button class="acao-btn" (click)="navegarPara('cliente/extrato')">
             <div class="acao-icon acao-icon--extrato">
               <span class="material-icons">receipt_long</span>
             </div>

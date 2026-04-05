@@ -3,7 +3,6 @@
 
 :host {
   --brand-dark: #0d2137;
-  --brand-mid: #1a3a5c;
   --brand-cyan: #4fc3f7;
   --danger: #dc2626;
   --sidebar-w: 240px;
@@ -147,6 +146,22 @@
   border-radius: 12px !important;
   background: #fff;
   border: 1px solid #e2e8f0;
+}
+
+.extrato-card {
+  overflow: hidden;
+}
+
+.extrato-table thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.extrato-table td {
+  font-size: 0.9rem;
 }
 
 .text-danger {

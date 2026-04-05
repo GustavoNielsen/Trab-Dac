@@ -1,6 +1,5 @@
 <div class="dashboard-wrapper">
 
-  <!-- ===================== SIDEBAR ===================== -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <div class="brand">
@@ -24,11 +23,11 @@
         <span class="material-icons">add_circle_outline</span>
         <span class="nav-label">Depositar</span>
       </a>
-      <a class="nav-item nav-item--active">
+      <a class="nav-item" (click)="router.navigate(['/cliente/saque'])">
         <span class="material-icons">remove_circle_outline</span>
         <span class="nav-label">Sacar</span>
       </a>
-      <a class="nav-item" (click)="router.navigate(['/cliente/transferencia'])">
+      <a class="nav-item nav-item--active">
         <span class="material-icons">swap_horiz</span>
         <span class="nav-label">Transferência</span>
       </a>
@@ -51,23 +50,19 @@
     </nav>
   </aside>
 
-  <!-- ===================== CONTEÚDO ===================== -->
   <main class="main-content">
 
-    <!-- Topbar -->
     <header class="topbar">
       <div>
         <h4 class="mb-0">
-          <span class="material-icons align-middle me-2 text-danger">remove_circle</span>
-          Saque
+          <span class="material-icons align-middle me-2 text-primary">swap_horiz</span>
+          Transferência TED
         </h4>
-        <small class="text-muted">Retire saldo da sua conta</small>
+        <small class="text-muted">Envie valor para outra conta BANTADS</small>
       </div>
     </header>
 
-    <!-- Loading -->
-    <div class="d-flex justify-content-center align-items-center flex-column gap-3 py-5"
-         *ngIf="carregando()">
+    <div class="d-flex justify-content-center align-items-center flex-column gap-3 py-5" *ngIf="carregando()">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Carregando...</span>
       </div>
@@ -76,77 +71,79 @@
 
     <div class="page-body" *ngIf="!carregando()">
 
-      <!-- ── Resumo da conta ── -->
       <div class="row g-3 mb-4">
-
         <div class="col-md-4">
           <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
-              <p class="text-muted small mb-1 text-uppercase fw-semibold">Saldo Atual</p>
-              <h5 class="mb-0"
-                  [class.text-danger]="saldoNegativo"
-                  [class.text-dark]="!saldoNegativo">
+              <p class="text-muted small mb-1 text-uppercase fw-semibold">Sua conta</p>
+              <h5 class="mb-0">{{ conta?.numeroConta ?? '—' }}</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <p class="text-muted small mb-1 text-uppercase fw-semibold">Saldo atual</p>
+              <h5 class="mb-0" [class.text-danger]="saldoNegativo" [class.text-dark]="!saldoNegativo">
                 <span *ngIf="saldoNegativo">- </span>
                 {{ (conta?.saldo ?? 0) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
               </h5>
             </div>
           </div>
         </div>
-
         <div class="col-md-4">
           <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
-              <p class="text-muted small mb-1 text-uppercase fw-semibold">Limite</p>
-              <h5 class="mb-0">
-                {{ (conta?.limite ?? 0) | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
-              </h5>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="card h-100 border-0 shadow-sm">
-            <div class="card-body">
-              <p class="text-muted small mb-1 text-uppercase fw-semibold">Disponível para Saque</p>
+              <p class="text-muted small mb-1 text-uppercase fw-semibold">Disponível</p>
               <h5 class="mb-0 text-primary">
                 {{ saldoDisponivel | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
               </h5>
             </div>
           </div>
         </div>
-
       </div>
 
-      <!-- ── Alerta de erro ── -->
-      <div class="alert alert-danger alert-dismissible d-flex align-items-center gap-2"
-           role="alert"
-           *ngIf="erro">
+      <div class="alert alert-danger d-flex align-items-center gap-2" role="alert" *ngIf="erro">
         <span class="material-icons">error_outline</span>
         <span>{{ erro }}</span>
-        <button type="button" class="btn-close" (click)="erro = ''" aria-label="Fechar"></button>
+        <button type="button" class="btn-close ms-auto" (click)="erro = ''" aria-label="Fechar"></button>
       </div>
 
-      <!-- ── Formulário de saque ── -->
       <div class="card border-0 shadow-sm" *ngIf="!sucesso">
         <div class="card-header bg-white border-bottom">
           <h5 class="mb-0 d-flex align-items-center gap-2">
-            <span class="material-icons text-danger">payments</span>
-            Realizar Saque
+            <span class="material-icons text-primary">send</span>
+            Dados da transferência
           </h5>
         </div>
-
         <div class="card-body p-4">
-          <form #formSaque="ngForm" (ngSubmit)="confirmar(formSaque)" novalidate>
+          <form #formTransf="ngForm" (ngSubmit)="confirmar(formTransf)" novalidate>
 
-            <div class="row">
-              <div class="col-md-5">
-                <label class="form-label fw-semibold" for="valorSaque">
-                  Valor do Saque <span class="text-danger">*</span>
-                </label>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" for="destino">Conta de destino <span class="text-danger">*</span></label>
+                <input
+                  id="destino"
+                  type="text"
+                  class="form-control form-control-lg"
+                  name="contaDestino"
+                  [(ngModel)]="contaDestinoStr"
+                  #destCtrl="ngModel"
+                  required
+                  minlength="4"
+                  placeholder="Ex.: 98765-4"
+                  [class.is-invalid]="destCtrl.invalid && destCtrl.touched"
+                  (focus)="erro = ''"
+                />
+                <div class="invalid-feedback">Informe o número da conta de destino.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-semibold" for="valorT">Valor <span class="text-danger">*</span></label>
                 <div class="input-group">
                   <span class="input-group-text">R$</span>
                   <input
-                    id="valorSaque"
+                    id="valorT"
                     type="text"
                     class="form-control form-control-lg"
                     name="valor"
@@ -160,67 +157,63 @@
                     [class.is-invalid]="valorCtrl.invalid && valorCtrl.touched"
                     (focus)="erro = ''"
                   />
-                  <div class="invalid-feedback">
-                    Informe um valor válido.
-                  </div>
                 </div>
                 <div class="form-text">
-                  Saldo disponível (incluindo limite):
-                  <strong>{{ saldoDisponivel | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+                  Disponível: <strong>{{ saldoDisponivel | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
                 </div>
               </div>
-            </div>
 
-            <!-- Aviso de limite -->
-            <div class="alert alert-warning d-flex align-items-center gap-2 mt-3"
-                 *ngIf="(conta?.saldo ?? 0) < 0">
-              <span class="material-icons">warning_amber</span>
-              <span>Sua conta está com saldo negativo. O saque só é permitido dentro do limite disponível.</span>
+              <div class="col-12">
+                <label class="form-label fw-semibold" for="desc">Descrição (opcional)</label>
+                <input
+                  id="desc"
+                  type="text"
+                  class="form-control"
+                  name="descricao"
+                  [(ngModel)]="descricao"
+                  maxlength="140"
+                  placeholder="Ex.: Aluguel março"
+                />
+              </div>
             </div>
 
             <hr class="my-4">
 
             <div class="d-flex justify-content-end gap-2">
-              <button
-                type="button"
-                class="btn btn-outline-secondary"
-                (click)="voltar()"
-                [disabled]="enviando">
+              <button type="button" class="btn btn-outline-secondary" (click)="voltar()" [disabled]="enviando">
                 Cancelar
               </button>
               <button
                 type="submit"
-                class="btn btn-danger px-4"
-                [disabled]="enviando || formSaque.invalid">
-                <span class="spinner-border spinner-border-sm me-2"
-                      role="status"
-                      *ngIf="enviando"></span>
+                class="btn btn-primary px-4"
+                [disabled]="enviando || formTransf.invalid">
+                <span class="spinner-border spinner-border-sm me-2" *ngIf="enviando" role="status"></span>
                 <span class="material-icons align-middle me-1" *ngIf="!enviando">check_circle</span>
-                {{ enviando ? 'Processando...' : 'Confirmar Saque' }}
+                {{ enviando ? 'Processando...' : 'Confirmar transferência' }}
               </button>
             </div>
-
           </form>
         </div>
       </div>
 
-      <!-- ── Card de sucesso ── -->
-      <div class="card border-0 shadow-sm border-danger" *ngIf="sucesso">
+      <div class="card border-0 shadow-sm border-primary" *ngIf="sucesso">
         <div class="card-body p-4 text-center">
-
           <div class="mb-3">
-            <span class="material-icons text-danger" style="font-size: 56px;">check_circle</span>
+            <span class="material-icons text-primary" style="font-size: 56px;">check_circle</span>
           </div>
-
-          <h4 class="fw-bold mb-1">Saque realizado com sucesso!</h4>
+          <h4 class="fw-bold mb-1">Transferência enviada!</h4>
           <p class="text-muted mb-4">O valor foi debitado da sua conta.</p>
 
-          <div class="table-responsive mx-auto" style="max-width: 400px;">
+          <div class="table-responsive mx-auto" style="max-width: 440px;">
             <table class="table table-bordered table-sm text-start">
               <tbody>
                 <tr>
-                  <th class="text-muted fw-normal" scope="row">Valor sacado</th>
-                  <td class="text-danger fw-bold">
+                  <th class="text-muted fw-normal" scope="row">Para conta</th>
+                  <td class="fw-semibold">{{ contaDestinoStr }}</td>
+                </tr>
+                <tr>
+                  <th class="text-muted fw-normal" scope="row">Valor</th>
+                  <td class="text-primary fw-bold">
                     - {{ valorConfirmado | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
                   </td>
                 </tr>
@@ -231,27 +224,26 @@
                   </td>
                 </tr>
                 <tr>
-                  <th class="text-muted fw-normal" scope="row">Data / Hora</th>
+                  <th class="text-muted fw-normal" scope="row">Data / hora</th>
                   <td>{{ dataHora | date:'dd/MM/yyyy HH:mm':'':'pt-BR' }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div class="d-flex justify-content-center gap-2 mt-3">
-            <button class="btn btn-outline-danger" (click)="novoSaque()">
-              <span class="material-icons align-middle me-1">remove_circle_outline</span>
-              Novo Saque
+          <div class="d-flex justify-content-center gap-2 mt-3 flex-wrap">
+            <button class="btn btn-outline-primary" (click)="novaTransferencia()">
+              <span class="material-icons align-middle me-1">swap_horiz</span>
+              Nova transferência
             </button>
             <button class="btn btn-primary" (click)="voltar()">
               <span class="material-icons align-middle me-1">home</span>
-              Voltar ao Início
+              Voltar ao início
             </button>
           </div>
-
         </div>
       </div>
 
-    </div><!-- /page-body -->
+    </div>
   </main>
 </div>

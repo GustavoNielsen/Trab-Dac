@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Cliente } from '../../../shared/models/cliente.model';
-import { GerenteService } from '../../../services/gerente-service';
+import { Cliente } from '../../shared/models/cliente.model';
+import { GerenteService } from '../../services/gerente-service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ClienteService } from '../../../services/cliente-service';
+import { ClienteService } from '../../services/cliente-service';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({

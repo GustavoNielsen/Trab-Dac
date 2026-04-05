@@ -33,6 +33,11 @@ export class ClienteService {
     return this.getClientesTempLocalStorage();
   }
 
+  /** Extrato por conta e período — stub até integração com gateway. */
+  consultarExtratoPorConta(_numeroConta: string, _inicio: Date, _fim: Date): any[] {
+    return [];
+  }
+
   buscaCep(cep: string): Observable<any> {
     // Remove caracteres não numéricos do CEP
     const cleanCep = cep.replace(/\D/g, '');
