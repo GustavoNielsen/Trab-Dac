@@ -2,14 +2,14 @@
   <h2 class="mb-4">Consulta de Extrato</h2>
 
   <div class="card mb-4 p-3">
-    <form class="row g-3">
+    <form class="row g-3" (ngSubmit)="consultar()">
       <div class="col-md-4">
         <label for="dataInicio" class="form-label">Data de Início</label>
-        <input type="date" class="form-control" id="dataInicio" name="dataInicio" required>
+        <input type="date" class="form-control" [(ngModel)]="dataInicio" name="dataInicio" required>
       </div>
       <div class="col-md-4">
         <label for="dataFim" class="form-label">Data de Fim</label>
-        <input type="date" class="form-control" id="dataFim" name="dataFim" required>
+        <input type="date" class="form-control" [(ngModel)]="dataFim" name="dataFim" required>
       </div>
       <div class="col-md-4 d-flex align-items-end">
         <button type="submit" class="btn btn-primary w-100">Consultar</button>
