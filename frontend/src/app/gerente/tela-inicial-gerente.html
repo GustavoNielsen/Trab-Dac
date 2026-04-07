@@ -1,0 +1,40 @@
+<div class="container my-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0">Pedidos de Autocadastro</h5>
+    <span class="badge bg-secondary">Total: {{ pedidos.length }}</span>
+  </div>
+
+  <div *ngIf="mensagem" class="alert alert-info py-2">
+    {{ mensagem }}
+  </div>
+
+  <div class="table-responsive" *ngIf="pedidos.length > 0; else vazio">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th scope="col">CPF</th>
+          <th scope="col">Nome</th>
+          <th scope="col">Salário</th>
+          <th scope="col">Limite</th>
+          <th scope="col" class="text-center" style="width: 220px;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of pedidos">
+          <td>{{ cliente.cpf }}</td>
+          <td>{{ cliente.nome }}</td>
+          <td>{{ cliente.salario | currency:'BRL':'symbol' }}</td>
+          <td>{{ cliente.limite | currency:'BRL':'symbol' }}</td>
+          <td class="text-center">
+            <button class="btn btn-success btn-sm me-2" (click)="aprovar(cliente)">Aprovar</button>
+            <button class="btn btn-outline-danger btn-sm" (click)="abrirModalRecusar(cliente)">Recusar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #vazio>
+    <p class="text-muted">Não há pedidos pendentes.</p>
+  </ng-template>
+</div>
