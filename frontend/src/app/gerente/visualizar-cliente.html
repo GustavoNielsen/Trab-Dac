@@ -1,0 +1,50 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a href="#" class="navbar-brand">Consultar Clientes</a>
+  </div>
+</nav>
+
+<div class="container my-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5>Lista de Clientes</h5>
+    <input type="text"
+           [(ngModel)]="pesquisa"
+           class="form-control w-25"
+           placeholder="Pesquisar por CPF ou Nome...">
+  </div>
+
+  <div class="table-responsive" *ngIf="clientesFiltrados.length > 0; else vazio">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th scope="col">CPF</th>
+          <th scope="col">Nome</th>
+          <th scope="col">Cidade</th>
+          <th scope="col">Estado</th>
+          <th scope="col" class="text-end">Saldo</th>
+          <th scope="col" class="text-end">Limite</th>
+          <th scope="col" class="text-center">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of clientesFiltrados">
+          <td>{{ cliente.cpf }}</td>
+          <td>{{ cliente.nome }}</td>
+          <td>{{ cliente.cidade }}</td>
+          <td>{{ cliente.uf }}</td>
+          <td class="text-end">{{ cliente.saldo | currency:'BRL':'symbol' }}</td>
+          <td class="text-end">{{ cliente.limite | currency:'BRL':'symbol' }}</td>
+          <td class="text-center">
+<a [routerLink]="['/gerente/consultar-cliente', cliente.cpf]" class="btn btn-outline-primary btn-sm">
+  Ver Detalhes
+</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #vazio>
+    <p class="text-muted">Nenhum cliente encontrado.</p>
+  </ng-template>
+</div>
