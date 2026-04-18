@@ -11,10 +11,10 @@ import lombok.*;
 public class UsuarioAuth {
     
     @Id
-    private String id; // No MongoDB, o ID costuma ser uma String (o famoso ObjectId)
-    
-    private String login;
+    private String id;
+    private String cpf;
+    private String nome;
+    private String email;
     private String senha;
-    private String perfil;
-
+    private String tipo; // CLIENTE, GERENTE, ADMINISTRADOR
 }

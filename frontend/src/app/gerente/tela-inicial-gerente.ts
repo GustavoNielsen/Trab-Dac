@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Cliente } from '../../../shared/models/cliente.model';
-import { GerenteService } from '../../../services/gerente-service';
+import { Cliente } from '../shared/models/cliente.model';
+import { GerenteService } from '../services/gerente-service';
 import { ModalRejeitarClienteComponent } from '../modal-rejeitarcliente/modal-rejeitarcliente';
-import { ClienteService } from '../../../services/cliente-service';
+import { ClienteService } from '../services/cliente-service';
+
 
 @Component({
   selector: 'app-tela-inicial',

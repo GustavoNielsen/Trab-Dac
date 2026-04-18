@@ -59,3 +59,25 @@ app.use('/auth', createProxyMiddleware({
 app.listen(PORT, () => {
   console.log(`🚀 API Gateway rodando em http://localhost:${PORT}`);
 });
+
+
+const { createProxyMiddleware } = require('http-proxy-middleware' );
+
+// Middleware de verificação de Token
+function verificarToken(req, res, next) {
+  const tokenHeader = req.headers['authorization'];
+  if (!tokenHeader) return res.status(401).send('Acesso negado.');
+  
+  const token = tokenHeader.split(' ')[1];
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(401).send('Token inválido.');
+    req.userRole = decoded.perfil;
+    next(); 
+  });
+}
+
+// Rota para o microserviço de autenticação
+app.use('/auth', createProxyMiddleware({
+  target: 'http://localhost:8081/auth',
+  changeOrigin: true,
+} ));
