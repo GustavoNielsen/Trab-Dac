@@ -7,9 +7,12 @@ import { Transferencia } from './pages/cliente/transferencia/transferencia';
 import { Extrato } from './pages/cliente/extrato/extrato';
 import { AprovarCliente } from './gerente/aprovar-cliente/aprovar-cliente';
 import { Consultar3Clientes } from './gerente/consultar-3-clientes/consultar-3-clientes';
+import { Login } from './pages/login/login';
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'cadastro', pathMatch: 'full' },
+    { path: '', redirectTo: 'login', pathMatch: 'full' },
+    { path: 'login', component: Login },
+    //{ path: '', redirectTo: 'cadastro', pathMatch: 'full' },
     { path: 'cadastro', component: Autocadastro },
 
     // Cliente
