@@ -1,6 +1,9 @@
 
+# TrabDAC (Angular)
 
+Documentação geral do monorepo (**Docker, gateway, back-end, rotas, Auth**): [**README na raiz**](../README.md).
 
+---
 
 ## Development server
 
