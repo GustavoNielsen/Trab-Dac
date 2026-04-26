@@ -50,6 +50,9 @@ export class Cliente extends Pessoa {
     conta?: string;
     papel: 'cliente' | 'gerente' | 'admin';
     senha: string; // validar lógica
+    motivoRecusa: string | undefined;
+    dataRejeicao: string | undefined;
+    estado: string | undefined;
 
     constructor(
         cpf: string = '',

@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
-import { Cliente } from '../../../shared/models/cliente.model';
+import { Cliente } from '../shared/models/cliente.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { GerenteService } from '../../../services/gerente-service';
+import { GerenteService } from '../services/gerente-service';
 
 @Component({
   selector: 'app-visualizar-clientes',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './visualizar-clientes.html',
-  styleUrl: './visualizar-clientes.css'
+  templateUrl: 'visualizar-cliente.html',
+  styleUrl: 'visualizar-clientes.css'
 })
 export class VisualizarClientes {
   pesquisa: string = '';
@@ -22,7 +22,7 @@ export class VisualizarClientes {
 
   carregarClientes() {
     const todosClientes = JSON.parse(localStorage.getItem('clientes') || '[]') as Cliente[];
-    this.clientes = todosClientes.filter(c => c.cpfGerente === this.gerenteService.cpfLogado);
+    this.clientes = todosClientes.filter(c => c.cpf === this.gerenteService.cpfLogado);
   }
 
   get clientesFiltrados(): Cliente[] {
