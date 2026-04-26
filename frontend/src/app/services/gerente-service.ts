@@ -7,6 +7,10 @@ import { Gerente } from '../shared/models/gerente.model';
   providedIn: 'root',
 })
 export class GerenteService {
+  rejeitarCliente(cliente: Cliente, motivoRejeicao: string) {
+    throw new Error('Method not implemented.');
+  }
+  
   constructor(private clienteService: ClienteService) {}
 
   cpfLogado: String = '';
@@ -27,5 +31,12 @@ export class GerenteService {
     return this.clienteService
       .getClientesTempLocalStorage()
       .find((c) => (c.cpf || '').replace(/\D/g, '') === n);
+  }
+
+  aprovarCliente(cliente: Cliente) {
+    throw new Error('Method not implemented.');
+  }
+  listarPendentes(): Cliente[] {
+    throw new Error('Method not implemented.');
   }
 }

@@ -1,24 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Cliente } from '../../../shared/models/cliente.model';
+import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Cliente } from '../shared/models/cliente.model';
 
 
 @Component({
   selector: 'app-modal-rejeitar-cliente',
   imports: [CommonModule, FormsModule],
-  templateUrl: './modal-rejeitarcliente.html',
-  styleUrl: './modal-rejeitarcliente.css'
+  templateUrl: 'modal-rejeitarcliente.html',
+  //providers: [NgbActiveModal],
+  //styleUrl: './modal-rejeitarcliente.css'
 })
 export class ModalRejeitarClienteComponent {
   @Input() cliente!: Cliente;
 
   motivoRejeicao: string = '';
 
+  public activeModal = inject(NgbActiveModal);
+
   constructor(
-    public activeModal: NgbActiveModal,
+    //public activeModal: NgbActiveModal,
     private router: Router
   ) {}
 
