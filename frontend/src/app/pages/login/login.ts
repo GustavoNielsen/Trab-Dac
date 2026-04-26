@@ -1,7 +1,8 @@
 import { CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { RouterModule } from "@angular/router";
+import { RouterModule, Router } from "@angular/router";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: 'app-login',
@@ -12,6 +13,11 @@ import { RouterModule } from "@angular/router";
 export class Login {
   credentials = { email: '', senha: '' };
   error = '';
+
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   onSubmit() {
     this.authService.login(this.credentials).subscribe({
