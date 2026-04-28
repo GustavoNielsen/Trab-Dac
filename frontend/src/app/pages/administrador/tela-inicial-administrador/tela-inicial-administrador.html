@@ -1,1 +1,155 @@
-<p>tela-inicial-administrador works!</p>
+<div class="container-fluid py-4 px-4" style="background:#f0f4f8; min-height:100vh;">
+
+  <!-- ===== TOPBAR ===== -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-0 fw-bold">
+        <span style="color:#1a3a5c;">🏦 BANTADS</span>
+        <span class="text-muted fw-normal fs-6 ms-2">— Painel do Administrador</span>
+      </h4>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+      <span class="badge bg-secondary">Administrador</span>
+      <button class="btn btn-sm btn-outline-danger" (click)="logout()">
+        Sair
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== LOADING ===== -->
+  <div class="text-center py-5" *ngIf="carregando">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-2 text-muted">Carregando dados...</p>
+  </div>
+
+  <!-- ===== ERRO ===== -->
+  <div class="alert alert-danger d-flex gap-2 align-items-center" *ngIf="erro && !carregando">
+    <span>⚠️ {{ erro }}</span>
+    <button class="btn btn-sm btn-outline-danger ms-auto" (click)="carregarDashboard()">Tentar novamente</button>
+  </div>
+
+  <div *ngIf="!carregando">
+
+    <!-- ===== CARDS DE RESUMO GERAL ===== -->
+    <div class="row g-3 mb-4">
+
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <p class="text-muted small text-uppercase mb-1">Gerentes</p>
+            <h3 class="fw-bold mb-0" style="color:#1a3a5c;">{{ totalGerentes }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <p class="text-muted small text-uppercase mb-1">Clientes</p>
+            <h3 class="fw-bold mb-0" style="color:#1a3a5c;">{{ totalClientes }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <p class="text-muted small text-uppercase mb-1">Total Positivo</p>
+            <h5 class="fw-bold mb-0 text-success">
+              {{ totalPositivo | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+            </h5>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <p class="text-muted small text-uppercase mb-1">Total Negativo</p>
+            <h5 class="fw-bold mb-0 text-danger">
+              - {{ totalNegativo | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+            </h5>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== MENU RÁPIDO ===== -->
+    <div class="d-flex gap-2 mb-4 flex-wrap">
+      <button class="btn btn-primary btn-sm" (click)="navegarPara('/admin/gerentes')">
+        👤 Gerenciar Gerentes
+      </button>
+      <button class="btn btn-outline-primary btn-sm" (click)="navegarPara('/admin/relatorio-clientes')">
+        📄 Relatório de Clientes
+      </button>
+    </div>
+
+    <!-- ===== TABELA DE GERENTES — R15 ===== -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 fw-semibold">Visão por Gerente</h6>
+        <small class="text-muted">Ordenado por maior saldo positivo</small>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover table-striped align-middle mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>CPF</th>
+              <th>E-mail</th>
+              <th class="text-center">Clientes</th>
+              <th class="text-end">Total Positivo</th>
+              <th class="text-end">Total Negativo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let g of gerentes; let i = index">
+              <td>
+                <span class="badge"
+                  [class.bg-warning]="i === 0"
+                  [class.bg-secondary]="i !== 0"
+                  [style.color]="i === 0 ? '#000' : '#fff'">
+                  {{ i + 1 }}º
+                </span>
+              </td>
+              <td class="fw-semibold">{{ g.nome }}</td>
+              <td class="text-muted">{{ g.cpf }}</td>
+              <td class="text-muted">{{ g.email }}</td>
+              <td class="text-center">
+                <span class="badge bg-primary rounded-pill">{{ g.totalClientes }}</span>
+              </td>
+              <td class="text-end text-success fw-semibold">
+                {{ g.totalSaldoPositivo | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </td>
+              <td class="text-end text-danger fw-semibold">
+                <span *ngIf="g.totalSaldoNegativo > 0">-</span>
+                {{ g.totalSaldoNegativo | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </td>
+            </tr>
+          </tbody>
+          <tfoot class="table-light fw-bold">
+            <tr>
+              <td colspan="4" class="text-end text-muted small pe-2">TOTAL</td>
+              <td class="text-center">{{ totalClientes }}</td>
+              <td class="text-end text-success">
+                {{ totalPositivo | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </td>
+              <td class="text-end text-danger">
+                <span *ngIf="totalNegativo > 0">-</span>
+                {{ totalNegativo | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="card-footer bg-white text-muted small">
+        {{ gerentes.length }} gerente(s) cadastrado(s)
+      </div>
+    </div>
+
+  </div><!-- /!carregando -->
+</div>
