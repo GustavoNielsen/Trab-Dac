@@ -3,7 +3,7 @@
 Projeto acadêmico de **Internet Banking** (disciplina DAC): front-end em **Angular**, **API Gateway** em Node.js, microsserviços em **Java/Spring Boot**, infraestrutura com **Docker** (PostgreSQL, MongoDB, RabbitMQ), alinhado ao enunciado (perfis Cliente, Gerente e Administrador; requisitos R1–R20 no documento oficial).
 
 ---
-
+cd 
 ## Estrutura do repositório
 
 | Pasta / arquivo | Descrição |
@@ -160,12 +160,4 @@ O escopo completo (**R1–R20**), arquitetura de microsserviços, **CQRS**, **SA
 
 ---
 
-## Repositório remoto
 
-Exemplo: `https://github.com/GustavoNielsen/Trab-Dac` (ajuste se o remoto do grupo for outro).
-
----
-
-## Licença e uso
-
-Uso acadêmico conforme regras da disciplina DAC / instituição.
