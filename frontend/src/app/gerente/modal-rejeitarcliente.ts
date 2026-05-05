@@ -1,8 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Cliente } from '../shared/models/cliente.model';
 
 
@@ -17,13 +15,7 @@ export class ModalRejeitarClienteComponent {
   @Input() cliente!: Cliente;
 
   motivoRejeicao: string = '';
-
-  public activeModal = inject(NgbActiveModal);
-
-  constructor(
-    //public activeModal: NgbActiveModal,
-    private router: Router
-  ) {}
+  closed = false;
 
   private atualizarCliente() {
     const clientes = JSON.parse(localStorage.getItem('clientes') || '[]') as Cliente[];
@@ -55,7 +47,6 @@ export class ModalRejeitarClienteComponent {
 
   alert(`Cliente rejeitado. Email enviado para ${this.cliente.email}.`);
 
-  this.activeModal.close(this.motivoRejeicao);
-  this.router.navigate(['/tela-inicial-gerente']);
-}
+  this.closed = true;
+  }
 }

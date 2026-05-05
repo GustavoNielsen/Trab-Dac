@@ -8,7 +8,18 @@ import { Gerente } from '../shared/models/gerente.model';
 })
 export class GerenteService {
   rejeitarCliente(cliente: Cliente, motivoRejeicao: string) {
-    throw new Error('Method not implemented.');
+    const motivo = (motivoRejeicao || '').trim();
+    if (!motivo) return;
+    const pendentes = this.listarPendentes().filter((c) => c.cpf !== cliente.cpf);
+    localStorage.setItem('clientesTemp', JSON.stringify(pendentes));
+
+    cliente.motivoRecusa = motivo;
+    cliente.dataRejeicao = new Date().toISOString();
+    cliente.estado = 'Rejeitado';
+
+    const recusados = JSON.parse(localStorage.getItem('clientesRecusados') || '[]') as Cliente[];
+    recusados.push(cliente);
+    localStorage.setItem('clientesRecusados', JSON.stringify(recusados));
   }
   
   constructor(private clienteService: ClienteService) {}
@@ -34,9 +45,21 @@ export class GerenteService {
   }
 
   aprovarCliente(cliente: Cliente) {
-    throw new Error('Method not implemented.');
+    const conta = Math.floor(1000 + Math.random() * 9000).toString();
+    const limite = cliente.salario >= 2000 ? cliente.salario / 2 : 0;
+    cliente.conta = conta;
+    cliente.limite = limite;
+    cliente.estado = 'Aprovado';
+    cliente.senha = cliente.senha || 'tads';
+
+    const pendentes = this.listarPendentes().filter((c) => c.cpf !== cliente.cpf);
+    localStorage.setItem('clientesTemp', JSON.stringify(pendentes));
+
+    const aprovados = JSON.parse(localStorage.getItem('clientesAprovados') || '[]') as Cliente[];
+    aprovados.push(cliente);
+    localStorage.setItem('clientesAprovados', JSON.stringify(aprovados));
   }
   listarPendentes(): Cliente[] {
-    throw new Error('Method not implemented.');
+    return this.clienteService.getClientesTempLocalStorage();
   }
 }

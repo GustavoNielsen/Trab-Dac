@@ -152,9 +152,11 @@ O escopo completo (**R1–R20**), arquitetura de microsserviços, **CQRS**, **SA
 
 ## Estado do projeto e boas práticas
 
-- Manter **`npm install`** e **`npx ng build`** passando no `frontend/` antes de entregas.
+- Estado atual (última revisão): **build do front compilando** com `npx ng build --configuration development`.
+- Foram aplicadas correções de compilação em módulos de **gerente** e **administrador** para viabilizar execução local de protótipo.
+- Ainda existem **warnings Angular** (ex.: `NG8107` em `consultar-cliente`) que não bloqueiam build, mas merecem limpeza.
 - Alinhar **token** (`token` vs `access_token`) entre `AuthService`, gateway e telas que usam `Authorization: Bearer ...`.
-- Componentes **administrador** e **gerente** podem estar em diferentes níveis de conclusão; integrar rotas e serviços de forma consistente.
+- Componentes **administrador** e **gerente** ainda estão em evolução funcional; validar cada rota antes da apresentação.
 - Pode haver **duas implementações** de extrato no código (`extrato` roteado vs `consultar-extrato`); convém definir uma única tela oficial.
 
 ---
@@ -205,6 +207,8 @@ Antes de apresentar, rode este checklist:
 - [ ] Verificar consistência de token (`token` vs `access_token`).
 - [ ] Conferir se não há links de menu apontando para rotas inexistentes.
 - [ ] Garantir que o `README.md` esteja atualizado com o estado real do projeto.
+- [ ] Revisar consistência visual (sidebar/topbar/cards) entre cliente, gerente e administrador.
+- [ ] Evitar `alert/prompt` em telas de demo, priorizando componentes visuais (cards, modais ou toast).
 
 ---
 
@@ -244,12 +248,13 @@ docker compose logs -f
 
 ---
 
-## Próximos passos sugeridos
+## Próximos passos
 
 1. Consolidar um fluxo único de extrato (evitar duplicidade de telas/componentes).
 2. Finalizar proteção de rotas por perfil (cliente, gerente, administrador).
 3. Integrar de ponta a ponta autenticação e autorização via gateway.
 4. Substituir mocks críticos por dados persistidos nos serviços.
-5. Adicionar testes mínimos para fluxos principais de navegação.
+5. Padronizar UX/UI entre perfis (tipografia, espaços, estados de loading/erro/vazio).
+6. Adicionar testes mínimos para fluxos principais de navegação.
 
 
