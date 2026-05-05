@@ -11,7 +11,7 @@ import lombok.*;
 public class UsuarioAuth {
     
     @Id
-    private String id;
+    private Long id;
     private String cpf;
     private String nome;
     private String email;
