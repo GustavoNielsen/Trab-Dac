@@ -1,1 +1,74 @@
-<p>listar-gerentes works!</p>
+<div class="container py-4">
+
+  <!-- Cabeçalho -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-0 fw-bold"> Gerentes</h4>
+      <small class="text-muted">Listagem de todos os gerentes — ordenada por nome</small>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm" (click)="voltar()">← Voltar</button>
+      <button class="btn btn-primary btn-sm" (click)="inserir()">+ Novo Gerente</button>
+    </div>
+  </div>
+
+  <!-- Sucesso -->
+  <div class="alert alert-success alert-dismissible" *ngIf="sucesso">
+     {{ sucesso }}
+    <button type="button" class="btn-close" (click)="sucesso = ''"></button>
+  </div>
+
+  <!-- Erro -->
+  <div class="alert alert-danger" *ngIf="erro && !carregando">
+     {{ erro }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="carregar()">Tentar novamente</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="carregando">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-2 text-muted">Carregando gerentes...</p>
+  </div>
+
+  <!-- Sem dados -->
+  <div class="alert alert-warning" *ngIf="!carregando && gerentes.length === 0 && !erro">
+    Nenhum gerente cadastrado.
+  </div>
+
+  <!-- Tabela -->
+  <div class="card border-0 shadow-sm" *ngIf="!carregando && gerentes.length > 0">
+    <div class="table-responsive">
+      <table class="table table-hover table-striped align-middle mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th class="text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let g of gerentes">
+            <td class="fw-semibold">{{ g.nome }}</td>
+            <td class="text-muted">{{ g.cpf }}</td>
+            <td>{{ g.email }}</td>
+            <td>{{ g.telefone }}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-primary me-1" (click)="editar(g.cpf)">
+                Editar
+              </button>
+              <button class="btn btn-sm btn-outline-danger" (click)="confirmarRemocao(g.cpf)">
+                Remover
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer bg-white text-muted small">
+      {{ gerentes.length }} gerente(s) cadastrado(s)
+    </div>
+  </div>
+
+</div>
