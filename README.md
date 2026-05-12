@@ -1,260 +1,179 @@
 # BANTADS — Trab-DAC
 
-Projeto acadêmico de **Internet Banking** (disciplina DAC): front-end em **Angular**, **API Gateway** em Node.js, microsserviços em **Java/Spring Boot**, infraestrutura com **Docker** (PostgreSQL, MongoDB, RabbitMQ), alinhado ao enunciado (perfis Cliente, Gerente e Administrador; requisitos R1–R20 no documento oficial).
+Sistema de **Internet Banking** para a disciplina **DAC**: front-end em **Angular 21**, **API Gateway** em Node.js (Express), microsserviços em **Java/Spring Boot**, infraestrutura com **Docker** (PostgreSQL, MongoDB, RabbitMQ). O escopo completo (R1–R20, CQRS, SAGA orquestrada, etc.) está no **documento oficial**; este arquivo descreve **como rodar e navegar** o que existe neste repositório.
 
 ---
+
+## Início rápido
+
+```bash
+# 1) Infraestrutura (opcional, se for testar com bancos locais)
+docker compose up -d
+
+# 2) API Gateway (porta 3000)
+cd apiGateway
+npm install
+node apiGateway.js
+
+# 3) Front-end (porta 4200)
+cd ../frontend
+npm install
+npm start
+```
+
+Abra o navegador em **http://localhost:4200** (redireciona para `/login`).
+
+Validação de build do front:
+
+```bash
+cd frontend
+npx ng build --configuration development
+```
+
+---
+
 ## Estrutura do repositório
 
-| Pasta / arquivo | Descrição |
-|-----------------|-----------|
-| `frontend/` | Aplicação **Angular 21** (SPA) |
-| `apiGateway/` | **API Gateway** (Express, proxy e JWT na porta **3000**) |
-| `backend/ms-autenticador/` | Microsserviço **Spring Boot** — autenticação (ex.: JWT) |
-| `docker-compose.yml` | Sobe **PostgreSQL**, **MongoDB** e **RabbitMQ** para desenvolvimento |
-| `init-db/` | Scripts SQL montados em `/docker-entrypoint-initdb.d` (PostgreSQL) |
+| Caminho | Conteúdo |
+|---------|-----------|
+| `frontend/` | SPA Angular (telas cliente, gerente, admin, login, serviços) |
+| `apiGateway/` | Ponto único de entrada HTTP (porta **3000**): `apiGateway.js`, rotas modulares (`cliente.routes.js`, `conta.routes.js`, `gerente.routes.js`, …) |
+| `backend/ms-autenticador/` | Microsserviço Spring Boot — autenticação (JWT, DTOs, etc.) |
+| `docker-compose.yml` | PostgreSQL, MongoDB e RabbitMQ para desenvolvimento |
+| `init-db/` | Scripts SQL executados na subida do Postgres |
 
 ---
 
 ## Pré-requisitos
 
-- **Node.js** + **npm** (Angular 21 no `frontend/`)
-- **Docker** e Docker Compose (para subir bancos e fila)
-- **Java 17+** e **Maven** (para compilar/rodar `backend/ms-autenticador`)
+- **Node.js** + **npm** (front e gateway)
+- **Docker** + Docker Compose (infra local)
+- **Java 17+** e **Maven** (ou `mvnw` do projeto) para o `ms-autenticador`
 
 ---
 
-## Infraestrutura local (Docker)
-
-Na raiz do repositório:
+## Infraestrutura (Docker)
 
 ```bash
 docker compose up -d
+docker compose ps
 ```
 
-Serviços típicos (ver `docker-compose.yml`):
-
-| Serviço | Porta | Uso indicado no doc |
-|---------|-------|----------------------|
-| PostgreSQL | 5432 | Dados transacionais (schemas por serviço) |
-| MongoDB | 27017 | Autenticação / dados conforme microsserviço |
-| RabbitMQ | 5672 (AMQP), 15672 (management UI) | Mensageria (ex.: CQRS / eventos) |
-
-Credenciais e nomes de banco estão definidos no próprio `docker-compose.yml`.
+Portas usuais: **5432** (Postgres), **27017** (Mongo), **5672 / 15672** (RabbitMQ). Credenciais em `docker-compose.yml`.
 
 ---
 
 ## API Gateway
 
-- Pasta: `apiGateway/`
-- Porta padrão: **3000**
-- Dependências: instalar com `npm install` dentro de `apiGateway/`
-- Variáveis: uso de `.env` (ex.: `JWT_SECRET`) — ver `apiGateway.js` e documentação do grupo
+- Diretório: `apiGateway/`
+- Porta: **3000**
+- Instalação: `npm install` dentro de `apiGateway/`
+- Configuração sensível (ex.: `JWT_SECRET`): arquivo **`.env`** na pasta do gateway, conforme `apiGateway.js`
 
-O front-end deve conversar com o sistema **somente** via este gateway (conforme enunciado), não diretamente com cada microsserviço.
-
----
-
-## Microsserviço de autenticação
-
-- Pasta: `backend/ms-autenticador/`
-- Build/execução típicos Maven:
-
-```bash
-cd backend/ms-autenticador
-./mvnw spring-boot:run
-```
-
-(Em Windows pode ser `mvnw.cmd`.)
+O enunciado exige que o **front fale apenas com o gateway**, não diretamente com cada microsserviço.
 
 ---
 
-## Front-end (Angular)
-
-### Executar em desenvolvimento
-
-```bash
-cd frontend
-npm install
-npm start
-```
-
-Abra `http://localhost:4200/`.
-
-### Build de produção
-
-```bash
-cd frontend
-npx ng build
-```
-
-Saída em `frontend/dist/`.
-
-### Tecnologias principais
-
-- Angular **21.x** (componentes standalone)
-- TypeScript, RxJS
-- **Bootstrap 5** (CDN em `frontend/src/index.html` onde aplicável)
-- **ngx-mask** em formulários que precisam de máscara
-- `HttpClient` (`provideHttpClient` em `app.config.ts`)
-
-### Autenticação no front (`AuthService`)
-
-- Arquivo: `frontend/src/app/services/auth.service.ts`
-- Login HTTP: `POST http://localhost:3000/auth/login`
-- Após sucesso, armazena em `localStorage` chaves como `token`, `user`, `role` (ajustar telas que ainda usarem `access_token` para manter consistência com o gateway).
-
-### Rotas (`frontend/src/app/app.routes.ts`)
-
-| Rota | Descrição |
-|------|-----------|
-| `/` | Redireciona para **`/login`** |
-| `/login` | Tela de login |
-| `/cadastro` | Autocadastro |
-| `/cliente` | Home do cliente |
-| `/deposito` ou `/cliente/deposito` | Depósito |
-| `/cliente/saque` | Saque |
-| `/cliente/transferencia` | Transferência |
-| `/cliente/extrato` | Extrato |
-| `/gerente/aprovar` | Aprovação de clientes |
-| `/gerente/top3` | Top 3 saldos |
-| `**` | Fallback (atualmente para `/cadastro`) |
-
-Outros componentes (ex.: **administrador** — relatório de clientes, CRUD de gerentes; **gerente** — visualização de clientes, tela inicial do gerente) podem existir em pastas e serem integrados às rotas conforme o grupo evoluir.
-
-### Pastas úteis em `frontend/src/app/`
-
-| Caminho | Conteúdo |
-|---------|----------|
-| `pages/login/` | Login |
-| `pages/cliente/` | Fluxos do cliente |
-| `pages/administrador/` | Telas do administrador |
-| `gerente/` | Fluxos do gerente (aprovar, top 3, consultas, etc.) |
-| `services/` | `ClienteService`, `GerenteService`, `AuthService`, … |
-| `shared/models/` | Modelos (`Cliente`, `Pessoa`, …) |
-
-### Endpoints usados pelo front (exemplos)
-
-Algumas telas chamam o gateway em **`http://localhost:3000`**, por exemplo:
-
-- `GET /conta/minha`, `GET /conta/extrato`
-- `POST /conta/saque`, `POST /conta/transferencia`
-- `POST /auth/login` (login)
-
-Se o gateway ou o back não estiverem no ar, partes do front podem usar **mock** ou tratamento de erro — comportamento a unificar em produção.
-
----
-
-## Requisitos funcionais (referência)
-
-O escopo completo (**R1–R20**), arquitetura de microsserviços, **CQRS**, **SAGA orquestrada**, **API Composition**, **Database per Service**, PostgreSQL + MongoDB e empacotamento em **Docker** estão no **documento oficial da disciplina**. Este README é apenas um mapa do repositório.
-
----
-
-## Estado do projeto e boas práticas
-
-- Estado atual (última revisão): **build do front compilando** com `npx ng build --configuration development`.
-- Foram aplicadas correções de compilação em módulos de **gerente** e **administrador** para viabilizar execução local de protótipo.
-- Ainda existem **warnings Angular** (ex.: `NG8107` em `consultar-cliente`) que não bloqueiam build, mas merecem limpeza.
-- Alinhar **token** (`token` vs `access_token`) entre `AuthService`, gateway e telas que usam `Authorization: Bearer ...`.
-- Componentes **administrador** e **gerente** ainda estão em evolução funcional; validar cada rota antes da apresentação.
-- Pode haver **duas implementações** de extrato no código (`extrato` roteado vs `consultar-extrato`); convém definir uma única tela oficial.
-
----
-
-## Roteiro de demonstração (protótipo front)
-
-Use este roteiro para apresentação curta (5–10 minutos), mesmo com parte do back em evolução:
-
-1. **Login (`/login`)**
-   - Mostrar a tela de autenticação.
-   - Explicar que o front envia `POST /auth/login` para o gateway.
-   - Destacar o armazenamento de sessão no `localStorage`.
-
-2. **Autocadastro (`/cadastro`)**
-   - Exibir formulário e validações básicas.
-   - Comentar integração com CEP e persistência temporária/local para protótipo.
-
-3. **Home Cliente (`/cliente`)**
-   - Mostrar menu principal e cartões de saldo/limite.
-   - Navegar para operações.
-
-4. **Operações do cliente**
-   - **Saque (`/cliente/saque`)**: validações de saldo e fluxo de sucesso.
-   - **Transferência (`/cliente/transferencia`)**: conta destino + valor.
-   - **Extrato (`/cliente/extrato`)**: lista de movimentações por período.
-
-5. **Fluxo gerente**
-   - **Aprovação (`/gerente/aprovar`)**: aprovar/rejeitar pedidos.
-   - **Top 3 (`/gerente/top3`)**: listar clientes com maiores saldos.
-
-6. **Módulo administrador (em evolução)**
-   - Mostrar telas já criadas (dashboard/relatórios/CRUD), mesmo que parcialmente mockadas.
-   - Informar o que está em andamento.
-
----
-
-## Checklist de pré-apresentação
-
-Antes de apresentar, rode este checklist:
-
-- [ ] `docker compose up -d` executado sem erro.
-- [ ] Gateway em execução na porta `3000`.
-- [ ] Front executando em `http://localhost:4200`.
-- [ ] Build do front (`npx ng build`) validado no dia da apresentação.
-- [ ] Rotas principais navegáveis: login, cadastro, cliente, saque, transferência, extrato, gerente.
-- [ ] Dados mínimos de demonstração preparados (clientes, contas, saldo, movimentações).
-- [ ] Mensagens de erro amigáveis para indisponibilidade da API.
-- [ ] Verificar consistência de token (`token` vs `access_token`).
-- [ ] Conferir se não há links de menu apontando para rotas inexistentes.
-- [ ] Garantir que o `README.md` esteja atualizado com o estado real do projeto.
-- [ ] Revisar consistência visual (sidebar/topbar/cards) entre cliente, gerente e administrador.
-- [ ] Evitar `alert/prompt` em telas de demo, priorizando componentes visuais (cards, modais ou toast).
-
----
-
-## Comandos úteis (resumo rápido)
-
-### Front-end
-
-```bash
-cd frontend
-npm install
-npm start
-npx ng build
-```
-
-### API Gateway
-
-```bash
-cd apiGateway
-npm install
-node apiGateway.js
-```
-
-### Autenticador (Spring)
+## Microsserviço de autenticação (Spring Boot)
 
 ```bash
 cd backend/ms-autenticador
 mvnw.cmd spring-boot:run
 ```
 
-### Infraestrutura
-
-```bash
-docker compose up -d
-docker compose ps
-docker compose logs -f
-```
+(Linux/macOS: `./mvnw spring-boot:run`.)
 
 ---
 
-## Próximos passos
+## Front-end (Angular)
 
-1. Consolidar um fluxo único de extrato (evitar duplicidade de telas/componentes).
-2. Finalizar proteção de rotas por perfil (cliente, gerente, administrador).
-3. Integrar de ponta a ponta autenticação e autorização via gateway.
-4. Substituir mocks críticos por dados persistidos nos serviços.
-5. Padronizar UX/UI entre perfis (tipografia, espaços, estados de loading/erro/vazio).
-6. Adicionar testes mínimos para fluxos principais de navegação.
+### Tecnologias
+
+- Angular **21** (standalone components)
+- TypeScript, RxJS
+- Bootstrap 5 (via CDN em `frontend/src/index.html` onde aplicável)
+- **ngx-mask** em formulários com máscara
+- `HttpClient` habilitado em `frontend/src/app/app.config.ts`
+
+### Login e sessão
+
+- Serviço: `frontend/src/app/services/auth.service.ts`
+- Chamada típica: `POST http://localhost:3000/auth/login`
+- Após login, o serviço grava no `localStorage` chaves como **`token`**, **`user`**, **`role`**
+
+**Atenção:** algumas telas ainda podem usar `access_token` no header. Vale unificar com o que o gateway e o `AuthService` esperam.
+
+### Rotas ativas (`frontend/src/app/app.routes.ts`)
+
+| Rota | Tela |
+|------|------|
+| `/` | Redireciona para `/login` |
+| `/login` | Login |
+| `/cadastro` | Autocadastro |
+| `/cliente` | Home do cliente |
+| `/deposito` ou `/cliente/deposito` | Depósito |
+| `/cliente/saque` | Saque |
+| `/cliente/transferencia` | Transferência |
+| `/cliente/extrato` | Extrato |
+| `/gerente/aprovar` | Aprovação de pedidos |
+| `/gerente/top3` | Top 3 clientes por saldo |
+| `**` | Fallback → `/cadastro` |
+
+Outros componentes (administrador, telas extras de gerente, `consultar-extrato` legado) podem existir em pastas **sem rota** até serem registrados em `app.routes.ts`.
+
+### Chamadas HTTP de exemplo (gateway)
+
+Base típica: `http://localhost:3000`
+
+- `POST /auth/login`
+- `GET /conta/minha`, `GET /conta/extrato`
+- `POST /conta/saque`, `POST /conta/transferencia`
+
+Com o gateway parado, várias telas usam **mock** ou fallback local para demonstração.
+
+### Gerente — protótipo local
+
+`GerenteService` pode usar **`localStorage`** (`clientesTemp`, listas de aprovados/recusados) para fluxo de demonstração. A rejeição na tela inicial do gerente pode usar **`window.prompt`** (sem `@ng-bootstrap/ng-bootstrap`), para manter o build sem dependência extra.
+
+---
+
+## Estado atual do projeto
+
+- **Build do front:** deve compilar com `npx ng build --configuration development`.
+- **Warnings:** por exemplo `NG8107` em `gerente/consultar-cliente` (não bloqueiam o build).
+- **Extrato:** há mais de um componente relacionado (`extrato` na rota principal e `consultar-extrato` em pasta separada); convém unificar.
+- **Admin / rotas:** telas em `pages/administrador/` podem precisar de rotas dedicadas (`/admin/...`) quando o fluxo for fechado.
+- **Visual:** padronizar sidebar/topbar entre perfis e substituir `alert/prompt` por modais ou toasts melhora a apresentação.
+
+---
+
+## Roteiro sugerido para demonstração (5–10 min)
+
+1. `/login` — autenticação e armazenamento de sessão.
+2. `/cadastro` — autocadastro e CEP.
+3. `/cliente` — menu e resumo.
+4. `/cliente/saque`, `/cliente/transferencia`, `/cliente/extrato` — operações.
+5. `/gerente/aprovar`, `/gerente/top3` — visão gerente.
+6. Módulo administrador — mostrar o que estiver pronto e marcar o que falta integrar.
+
+---
+
+## Checklist antes de apresentar
+
+- [ ] `docker compose up -d` (se for usar infra local)
+- [ ] Gateway na porta **3000**
+- [ ] `npm start` no `frontend/` e app abrindo em **4200**
+- [ ] `npx ng build` sem erro no dia
+- [ ] Rotas principais testadas manualmente
+- [ ] Token unificado (`token` vs `access_token`)
+- [ ] README revisado (este arquivo)
+
+---
+
+## Repositório remoto
+
+Exemplo: `https://github.com/GustavoNielsen/Trab-Dac`
+
+---
 
 
