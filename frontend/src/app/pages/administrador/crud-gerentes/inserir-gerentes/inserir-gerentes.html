@@ -1,1 +1,125 @@
-<p>inserir-gerentes works!</p>
+<div class="container py-4" style="max-width: 600px;">
+
+  <!-- Cabeçalho -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-0 fw-bold">➕ Novo Gerente</h4>
+      <small class="text-muted">R17 — Inserção de Gerente</small>
+    </div>
+    <button class="btn btn-outline-secondary btn-sm" (click)="voltar()">← Voltar</button>
+  </div>
+
+  <!-- Sucesso -->
+  <div class="card border-0 shadow-sm text-center p-5" *ngIf="sucesso">
+    <div class="mb-3" style="font-size: 48px;">✅</div>
+    <h5 class="fw-bold">Gerente inserido com sucesso!</h5>
+    <p class="text-muted">A conta foi atribuída automaticamente pelo sistema.</p>
+    <div class="d-flex justify-content-center gap-2 mt-3">
+      <button class="btn btn-outline-primary" (click)="sucesso = false; gerente = { cpf:'', nome:'', email:'', telefone:'', senha:'', confirmarSenha:'' }">
+        Inserir outro
+      </button>
+      <button class="btn btn-primary" (click)="voltar()">Ver listagem</button>
+    </div>
+  </div>
+
+  <!-- Formulário -->
+  <div class="card border-0 shadow-sm" *ngIf="!sucesso">
+    <div class="card-body p-4">
+
+      <!-- Erro -->
+      <div class="alert alert-danger alert-dismissible d-flex gap-2" *ngIf="erro">
+        <span>⚠️ {{ erro }}</span>
+        <button type="button" class="btn-close ms-auto" (click)="erro = ''"></button>
+      </div>
+
+      <form #formInserir="ngForm" (ngSubmit)="salvar(formInserir)" novalidate>
+
+        <!-- CPF -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="cpf">CPF <span class="text-danger">*</span></label>
+          <input
+            id="cpf" type="text" class="form-control" name="cpf"
+            [(ngModel)]="gerente.cpf" #cpfCtrl="ngModel"
+            required minlength="11" maxlength="14"
+            placeholder="000.000.000-00"
+            [class.is-invalid]="cpfCtrl.invalid && cpfCtrl.touched" />
+          <div class="invalid-feedback">CPF é obrigatório.</div>
+        </div>
+
+        <!-- Nome -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="nome">Nome <span class="text-danger">*</span></label>
+          <input
+            id="nome" type="text" class="form-control" name="nome"
+            [(ngModel)]="gerente.nome" #nomeCtrl="ngModel"
+            required
+            placeholder="Nome completo"
+            [class.is-invalid]="nomeCtrl.invalid && nomeCtrl.touched" />
+          <div class="invalid-feedback">Nome é obrigatório.</div>
+        </div>
+
+        <!-- E-mail -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="email">E-mail <span class="text-danger">*</span></label>
+          <input
+            id="email" type="email" class="form-control" name="email"
+            [(ngModel)]="gerente.email" #emailCtrl="ngModel"
+            required email
+            placeholder="gerente@bantads.com.br"
+            [class.is-invalid]="emailCtrl.invalid && emailCtrl.touched" />
+          <div class="invalid-feedback">Informe um e-mail válido.</div>
+        </div>
+
+        <!-- Telefone -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="telefone">Telefone <span class="text-danger">*</span></label>
+          <input
+            id="telefone" type="text" class="form-control" name="telefone"
+            [(ngModel)]="gerente.telefone" #telCtrl="ngModel"
+            required
+            placeholder="(00) 00000-0000"
+            [class.is-invalid]="telCtrl.invalid && telCtrl.touched" />
+          <div class="invalid-feedback">Telefone é obrigatório.</div>
+        </div>
+
+        <hr>
+
+        <!-- Senha -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="senha">Senha <span class="text-danger">*</span></label>
+          <input
+            id="senha" type="password" class="form-control" name="senha"
+            [(ngModel)]="gerente.senha" #senhaCtrl="ngModel"
+            required minlength="4"
+            placeholder="Mínimo 4 caracteres"
+            [class.is-invalid]="senhaCtrl.invalid && senhaCtrl.touched" />
+          <div class="invalid-feedback">Senha mínima de 4 caracteres.</div>
+        </div>
+
+        <!-- Confirmar senha -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold" for="confirmarSenha">Confirmar Senha <span class="text-danger">*</span></label>
+          <input
+            id="confirmarSenha" type="password" class="form-control" name="confirmarSenha"
+            [(ngModel)]="gerente.confirmarSenha" #confCtrl="ngModel"
+            required
+            placeholder="Repita a senha"
+            [class.is-invalid]="confCtrl.touched && gerente.senha !== gerente.confirmarSenha" />
+          <div class="invalid-feedback">As senhas não conferem.</div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-outline-secondary" (click)="voltar()" [disabled]="enviando">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary px-4" [disabled]="enviando || formInserir.invalid">
+            <span class="spinner-border spinner-border-sm me-1" *ngIf="enviando"></span>
+            {{ enviando ? 'Salvando...' : 'Salvar' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
