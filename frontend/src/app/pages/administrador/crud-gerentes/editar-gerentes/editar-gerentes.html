@@ -1,1 +1,104 @@
-<p>editar-gerentes works!</p>
+<div class="container py-4" style="max-width: 600px;">
+
+  <!-- Cabeçalho -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-0 fw-bold">✏️ Alterar Gerente</h4>
+      
+    </div>
+    <button class="btn btn-outline-secondary btn-sm" (click)="voltar()">← Voltar</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="carregando">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-2 text-muted">Carregando dados do gerente...</p>
+  </div>
+
+  <!-- Sucesso -->
+  <div class="card border-0 shadow-sm text-center p-5" *ngIf="sucesso">
+    <div class="mb-3" style="font-size: 48px;">✅</div>
+    <h5 class="fw-bold">Gerente alterado com sucesso!</h5>
+    <button class="btn btn-primary mt-3" (click)="voltar()">← Voltar à listagem</button>
+  </div>
+
+  <!-- Formulário -->
+  <div class="card border-0 shadow-sm" *ngIf="!carregando && !sucesso">
+    <div class="card-body p-4">
+
+      <!-- Erro -->
+      <div class="alert alert-danger alert-dismissible d-flex gap-2" *ngIf="erro">
+        <span>⚠️ {{ erro }}</span>
+        <button type="button" class="btn-close ms-auto" (click)="erro = ''"></button>
+      </div>
+
+      <form #formAlterar="ngForm" (ngSubmit)="salvar(formAlterar)" novalidate>
+
+        <!-- CPF — somente leitura -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">CPF</label>
+          <input type="text" class="form-control bg-light" [value]="gerente.cpf" readonly />
+          <div class="form-text">O CPF não pode ser alterado.</div>
+        </div>
+
+        <!-- Nome -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="nome">Nome <span class="text-danger">*</span></label>
+          <input
+            id="nome" type="text" class="form-control" name="nome"
+            [(ngModel)]="gerente.nome" #nomeCtrl="ngModel"
+            required
+            [class.is-invalid]="nomeCtrl.invalid && nomeCtrl.touched" />
+          <div class="invalid-feedback">Nome é obrigatório.</div>
+        </div>
+
+        <!-- E-mail -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="email">E-mail <span class="text-danger">*</span></label>
+          <input
+            id="email" type="email" class="form-control" name="email"
+            [(ngModel)]="gerente.email" #emailCtrl="ngModel"
+            required email
+            [class.is-invalid]="emailCtrl.invalid && emailCtrl.touched" />
+          <div class="invalid-feedback">Informe um e-mail válido.</div>
+        </div>
+
+        <hr>
+        <p class="text-muted small mb-3">Deixe os campos de senha em branco para não alterar.</p>
+
+        <!-- Nova senha -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold" for="senha">Nova Senha</label>
+          <input
+            id="senha" type="password" class="form-control" name="senha"
+            [(ngModel)]="gerente.senha"
+            placeholder="Nova senha (opcional)" />
+        </div>
+
+        <!-- Confirmar senha -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold" for="confirmarSenha">Confirmar Nova Senha</label>
+          <input
+            id="confirmarSenha" type="password" class="form-control" name="confirmarSenha"
+            [(ngModel)]="gerente.confirmarSenha"
+            placeholder="Repita a nova senha"
+            [class.is-invalid]="gerente.senha && gerente.senha !== gerente.confirmarSenha" />
+          <div class="invalid-feedback">As senhas não conferem.</div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-outline-secondary" (click)="voltar()" [disabled]="enviando">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary px-4"
+            [disabled]="enviando || formAlterar.invalid || (!!gerente.senha && gerente.senha !== gerente.confirmarSenha)">
+            <span class="spinner-border spinner-border-sm me-1" *ngIf="enviando"></span>
+            {{ enviando ? 'Salvando...' : 'Salvar Alterações' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
