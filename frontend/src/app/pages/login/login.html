@@ -1,1 +1,46 @@
-<p>login works!</p>
+<div class="login-page">
+  <div class="login-card">
+    <h1>BANTADS</h1>
+    <p class="subtitle">Internet Banking do TADS</p>
+
+    <form (ngSubmit)="onSubmit()" #formLogin="ngForm" novalidate>
+      <div class="mb-3">
+        <label for="email" class="form-label">E-mail</label>
+        <input
+          id="email"
+          type="email"
+          class="form-control"
+          name="email"
+          [(ngModel)]="credentials.email"
+          required
+          email
+          placeholder="seu@email.com"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="senha" class="form-label">Senha</label>
+        <input
+          id="senha"
+          type="password"
+          class="form-control"
+          name="senha"
+          [(ngModel)]="credentials.senha"
+          required
+          placeholder="Senha"
+        />
+      </div>
+
+      <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+      <button type="submit" class="btn btn-primary w-100" [disabled]="formLogin.invalid || loading">
+        {{ loading ? 'Entrando...' : 'Entrar' }}
+      </button>
+    </form>
+
+    <p class="mt-3 text-center">
+      Ainda não tem conta?
+      <a routerLink="/cadastro">Solicitar autocadastro</a>
+    </p>
+  </div>
+</div>

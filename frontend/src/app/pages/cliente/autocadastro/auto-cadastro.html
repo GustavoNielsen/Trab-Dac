@@ -19,8 +19,16 @@
       <p class="panel-sub">
         Preencha seus dados. Após o envio, sua solicitação segue para análise de um gerente.
       </p>
+      <p class="panel-sub">
+        Já possui conta? <a routerLink="/login">Fazer login</a>
+      </p>
 
-      <form #formCadastro="ngForm" (ngSubmit)="cadastrarUsuarioLocalStorage(formCadastro)" novalidate>
+      <div class="alert alert-success" *ngIf="sucesso">
+        Solicitação enviada com sucesso! Aguarde a aprovação de um gerente. A senha será enviada por e-mail após a aprovação.
+      </div>
+      <div class="alert alert-danger" *ngIf="erro">{{ erro }}</div>
+
+      <form #formCadastro="ngForm" (ngSubmit)="cadastrar(formCadastro)" novalidate>
         <h3 class="section-title">
           <span class="material-icons">badge</span>
           Dados pessoais
@@ -123,7 +131,7 @@
 
         <div class="actions">
           <button type="button" class="ac-btn ac-btn--ghost" (click)="limparFormulario(formCadastro)">Limpar</button>
-          <button type="submit" class="ac-btn ac-btn--primary" [disabled]="formCadastro.invalid">
+          <button type="submit" class="ac-btn ac-btn--primary" [disabled]="formCadastro.invalid || enviando">
             <span class="material-icons ac-btn-ico">send</span>
             Enviar solicitação
           </button>

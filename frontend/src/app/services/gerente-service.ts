@@ -41,7 +41,7 @@ export class GerenteService {
     const n = (cpf || '').replace(/\D/g, '');
     return this.clienteService
       .getClientesTempLocalStorage()
-      .find((c) => (c.cpf || '').replace(/\D/g, '') === n);
+      .find((c: Cliente) => (c.cpf || '').replace(/\D/g, '') === n);
   }
 
   aprovarCliente(cliente: Cliente) {

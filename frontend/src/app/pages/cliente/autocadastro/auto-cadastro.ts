@@ -1,55 +1,64 @@
-// src/app/autocadastro/autocadastro.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Cliente } from '../../../shared/models/cliente.model';
-import { NgForm } from '@angular/forms';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { ClienteService } from '../../../services/cliente-service';
 import { provideNgxMask } from 'ngx-mask';
-import { HttpClientModule } from '@angular/common/http'; // Importar HttpClientModule
-
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-autocadastro',
   standalone: true,
-  imports: [FormsModule, CommonModule, HttpClientModule], // Adicionar HttpClientModule aqui
-  providers: [provideNgxMask( ), ClienteService], // Adicionar ClienteService aos providers
+  imports: [FormsModule, CommonModule, RouterModule],
+  providers: [provideNgxMask()],
   templateUrl: './auto-cadastro.html',
-  styleUrls: ['./auto-cadastro.css']
+  styleUrls: ['./auto-cadastro.css'],
 })
 export class Autocadastro {
+  cliente: Cliente = new Cliente();
+  enviando = false;
+  sucesso = false;
+  erro = '';
 
   constructor(private clienteService: ClienteService) {}
 
-  cliente: Cliente = new Cliente();
-
-  cadastrarUsuarioLocalStorage(form: NgForm){
-    if (form.invalid) {
-      console.log("Formulário inválido, preencha todos os campos obrigatórios!");
+  cadastrar(form: NgForm): void {
+    if (form.invalid || this.enviando) {
       return;
-    }else{
-      const salarioString = String(this.cliente.salario)
-        .replace(/\./g, '')     // remove separador de milhar
-        .replace(',', '.')     // substitui vírgula por ponto decimal
-        .replace('R$', '')     // remove prefixo, se houver
-        .trim();
-
-      this.cliente.salario = parseFloat(salarioString || '0'); 
-      
-      this.clienteService.salvarClientesTempLocalStorage(this.cliente);
-      alert('Cliente cadastrado com sucesso!');
-      this.limparFormulario(form);
     }
+
+    this.enviando = true;
+    this.erro = '';
+    this.sucesso = false;
+
+    const salarioString = String(this.cliente.salario)
+      .replace(/\./g, '')
+      .replace(',', '.')
+      .replace('R$', '')
+      .trim();
+    this.cliente.salario = parseFloat(salarioString || '0');
+
+    this.clienteService.autocadastrar(this.cliente).subscribe({
+      next: () => {
+        this.sucesso = true;
+        this.enviando = false;
+        this.limparFormulario(form);
+      },
+      error: (err: Error) => {
+        this.erro = err.message;
+        this.enviando = false;
+      },
+    });
   }
 
-  limparFormulario(form: NgForm) {
+  limparFormulario(form: NgForm): void {
     form.reset();
-    this.cliente = new Cliente(); // Resetar o objeto cliente também
+    this.cliente = new Cliente();
   }
 
-  consultaCEP() {
+  consultaCEP(): void {
     const cep = this.cliente.cep;
-    if (cep && cep.length === 9) { // Verifica se o CEP tem o formato completo (ex: 00000-000)
+    if (cep && cep.length === 9) {
       this.clienteService.buscaCep(cep).subscribe({
         next: (dadosCep: any) => {
           if (dadosCep && !dadosCep.erro) {
@@ -58,25 +67,19 @@ export class Autocadastro {
             this.cliente.cidade = dadosCep.localidade;
             this.cliente.uf = dadosCep.uf;
           } else {
-            console.log('CEP inválido ou não encontrado.');
-            alert('CEP inválido ou não encontrado. Por favor, verifique o CEP digitado.');
+            alert('CEP inválido ou não encontrado.');
             this.limparCamposEndereco();
           }
         },
-        error: (error) => {
-          console.error('Erro ao buscar CEP:', error);
-          alert('Erro ao buscar CEP. Por favor, tente novamente mais tarde.');
+        error: () => {
+          alert('Erro ao buscar CEP.');
           this.limparCamposEndereco();
-        }
+        },
       });
-    } else if (cep && cep.length > 0) {
-      console.log('Formato de CEP inválido. Digite um CEP no formato 00000-000.');
-      alert('Formato de CEP inválido. Digite um CEP no formato 00000-000.');
-      this.limparCamposEndereco();
     }
   }
 
-  private limparCamposEndereco() {
+  private limparCamposEndereco(): void {
     this.cliente.endereco = '';
     this.cliente.bairro = '';
     this.cliente.cidade = '';

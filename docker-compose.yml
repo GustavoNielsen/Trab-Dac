@@ -4,11 +4,11 @@ services:
     image: postgres:15
     container_name: bantads-postgres
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: bantads
+      POSTGRES_PASSWORD: bantads
       POSTGRES_DB: bantads
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db:/docker-entrypoint-initdb.d

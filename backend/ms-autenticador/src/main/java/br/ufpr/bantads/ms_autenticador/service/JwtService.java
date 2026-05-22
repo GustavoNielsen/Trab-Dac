@@ -15,14 +15,16 @@ import java.security.Key;
 
 @Service
 public class JwtService {
+
     @Value("${jwt.secret}")
     private String secretKey;
 
-    public String generateToken(String email, String role) {
-        Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("perfil", role);
+    public String generateToken(String email, String role, String cpf) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("perfil", role);
+        claims.put("cpf", cpf);
         return Jwts.builder()
-                .setClaims(extraClaims)
+                .setClaims(claims)
                 .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000))
@@ -31,7 +33,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-    byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-    return Keys.hmacShaKeyFor(keyBytes);
-}
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 }

@@ -59,7 +59,9 @@ docker compose up -d
 docker compose ps
 ```
 
-Portas usuais: **5432** (Postgres), **27017** (Mongo), **5672 / 15672** (RabbitMQ). Credenciais em `docker-compose.yml`.
+Portas usuais: **5434** (Postgres do Docker — evita conflito com Postgres local nas portas 5432/5433), **27017** (Mongo), **5672 / 15672** (RabbitMQ). Postgres: usuário/senha **`bantads` / `bantads`**, banco **`bantads`**.
+
+**Erro de autenticação no Postgres ao autocadastrar?** Verifique com `netstat -ano | findstr :5434` se só o Docker escuta na porta. Se houver `postgres.exe` local na mesma porta, use a 5434 do projeto ou pare o serviço PostgreSQL do Windows. Execute `scripts\reset-postgres.bat` e reinicie `ms-cliente` e `ms-gerente`.
 
 ---
 

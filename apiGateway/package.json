@@ -1,5 +1,18 @@
 {
+  "name": "bantads-api-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "main": "apiGateway.js",
+  "scripts": {
+    "start": "node apiGateway.js"
+  },
   "dependencies": {
-    "jsonwebtoken": "^9.0.3"
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "http-proxy-middleware": "^3.0.3",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0"
   }
 }
