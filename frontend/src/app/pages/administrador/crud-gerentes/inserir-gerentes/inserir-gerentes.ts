@@ -8,7 +8,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   selector: 'app-inserir-gerente',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './inserir-gerente.html',
+  templateUrl: './inserir-gerentes.html',
 })
 export class InserirGerente {
 

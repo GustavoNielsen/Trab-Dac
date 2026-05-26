@@ -1,13 +1,14 @@
 package br.ufpr.bantads.ms_autenticador.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import br.ufpr.bantads.ms_autenticador.DTO.LoginRequestDTO;
+import br.ufpr.bantads.ms_autenticador.DTO.LoginResponseDTO;
+import br.ufpr.bantads.ms_autenticador.DTO.UsuarioDTO;
+import br.ufpr.bantads.ms_autenticador.UsuarioAuth;
 import br.ufpr.bantads.ms_autenticador.repository.AuthRepository;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.stereotype.Service;
-import java.util.Optional;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import br.ufpr.bantads.ms_autenticador.UsuarioAuth;
-import br.ufpr.bantads.ms_autenticador.DTO.*;
 
 @Service
 @RequiredArgsConstructor
@@ -17,41 +18,30 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    // O Spring injeta automaticamente estas dependências aqui no construtor
-    // public AuthService(AuthService authRepository, PasswordEncoder passwordEncoder) {
-    //     this.authRepository = authRepository;
-    //     this.passwordEncoder = passwordEncoder;
-    // }
-
-    public Optional<UsuarioAuth> findByEmail(String email) {
-        return authRepository.findByEmail(email);
-    }
-
-    // public Optional<UsuarioAuth> fazerLogin(String email, String senha) {
-    //     Optional<UsuarioAuth> usuarioOpt = authRepository.findByLogin(email);
-    //     if (usuarioOpt.isPresent()) {
-    //         UsuarioAuth usuario = usuarioOpt.get();
-    //         if (passwordEncoder.matches(senha, usuario.getSenha())) {
-    //             return Optional.of(usuario);
-    //         }
-    //     }
-    //     return Optional.empty();
-    // }
-
     public LoginResponseDTO login(LoginRequestDTO request) {
         UsuarioAuth user = authRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if (!user.isAtivo()) {
+            throw new RuntimeException("Conta ainda não aprovada. Aguarde a confirmação do gerente.");
+        }
 
         if (!passwordEncoder.matches(request.getSenha(), user.getSenha())) {
             throw new RuntimeException("Senha inválida");
         }
 
-        String token = jwtService.generateToken(user.getEmail(), user.getTipo());
+        String token = jwtService.generateToken(user.getEmail(), user.getTipo(), user.getCpf());
+
         return LoginResponseDTO.builder()
                 .access_token(token)
                 .token_type("bearer")
                 .tipo(user.getTipo())
-                .usuario(UsuarioDTO.builder().id(user.getId()).cpf(user.getCpf()).nome(user.getNome()).email(user.getEmail()).build())
+                .usuario(UsuarioDTO.builder()
+                        .id(user.getId())
+                        .cpf(user.getCpf())
+                        .nome(user.getNome())
+                        .email(user.getEmail())
+                        .build())
                 .build();
-    }   
+    }
 }

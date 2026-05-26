@@ -8,6 +8,7 @@ import { Extrato } from './pages/cliente/extrato/extrato';
 import { AprovarCliente } from './gerente/aprovar-cliente/aprovar-cliente';
 import { Consultar3Clientes } from './gerente/consultar-3-clientes/consultar-3-clientes';
 import { Login } from './pages/login/login';
+import { TelaInicialAdministrador } from './pages/administrador/tela-inicial-administrador/tela-inicial-administrador';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -27,6 +28,9 @@ export const routes: Routes = [
     { path: 'gerente/aprovar', component: AprovarCliente },
     { path: 'gerente/top3', component: Consultar3Clientes },
 
+    // Admin
+    { path: 'admin', component: TelaInicialAdministrador },
+
     // Fallback
-    { path: '**', redirectTo: 'cadastro' }
+    { path: '**', redirectTo: 'login' }
 ];
