@@ -5,6 +5,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
+const authRoutes = require('./auth.routes');
 const clienteRoutes = require('./cliente.routes');
 const contaRoutes = require('./conta.routes');
 const gerenteRoutes = require('./gerente.routes');
@@ -20,11 +21,7 @@ app.get('/', (req, res) => {
   res.send('BANTADS API Gateway ativo');
 });
 
-app.use('/auth', createProxyMiddleware({
-  target: process.env.AUTH_SERVICE_URL || 'http://localhost:8081',
-  changeOrigin: true,
-  logLevel: 'warn'
-}));
+app.use('/auth', authRoutes);
 
 app.use(clienteRoutes);
 app.use(contaRoutes);
