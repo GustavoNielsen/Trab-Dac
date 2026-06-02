@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const tokenBlacklist = require('../token-blacklist');
 
 function normalizarTipo(tipo) {
   if (tipo === 'ADMINISTRADOR') return 'ADMIN';
@@ -14,9 +15,17 @@ function authMiddleware(req, res, next) {
 
   const token = tokenHeader.split(' ')[1];
 
+  if (tokenBlacklist.estaInvalidado(token)) {
+    return res.status(401).json({ message: 'Token invalidado por logout.' });
+  }
+
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: 'Token inválido ou expirado.' });
+    }
+
+    if (tokenBlacklist.usuarioInvalidado(decoded.cpf)) {
+      return res.status(401).json({ message: 'Sessão do usuário invalidada.' });
     }
 
     req.user = {
