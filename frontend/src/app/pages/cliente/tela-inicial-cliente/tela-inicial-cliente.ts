@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe, SlicePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-tela-inicial-cliente',
@@ -37,7 +38,10 @@ export class TelaInicialCliente implements OnInit {
   // Primeiro nome para o header
   primeiroNome = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     // TODO: carregar dados reais do cliente/conta
@@ -57,6 +61,8 @@ export class TelaInicialCliente implements OnInit {
   }
 
   logout(): void {
-    this.router.navigate(['login']);
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
   }
 }

@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/c
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { finalize, timeout } from 'rxjs/operators';
 
@@ -38,6 +39,7 @@ export class Extrato implements OnInit {
 
   constructor(
     public router: Router,
+    private authService: AuthService,
     private http: HttpClient,
   ) {}
 
@@ -164,5 +166,11 @@ export class Extrato implements OnInit {
     if (valor > 0) return 'text-success';
     if (valor < 0) return 'text-danger';
     return 'text-muted';
+  }
+
+  logout(): void {
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
   }
 }

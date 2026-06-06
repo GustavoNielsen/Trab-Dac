@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-deposito',
@@ -25,7 +26,10 @@ export class Deposito implements OnInit {
 
   conta: any = null;
 
-  constructor(public router: Router) {}
+  constructor(
+    public router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     // TODO: carregar dados reais da conta
@@ -44,5 +48,11 @@ export class Deposito implements OnInit {
     this.sucesso  = false;
     this.erro     = '';
     this.valorStr = '';
+  }
+
+  logout(): void {
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
   }
 }

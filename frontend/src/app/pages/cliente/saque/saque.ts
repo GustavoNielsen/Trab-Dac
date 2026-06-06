@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/c
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { provideNgxMask } from 'ngx-mask';
 import { finalize, timeout } from 'rxjs/operators';
@@ -35,7 +36,11 @@ export class Saque implements OnInit {
   // URL base do API Gateway — ajuste se necessário
   private readonly API = 'http://localhost:3000';
 
-  constructor(public router: Router, private http: HttpClient) {}
+  constructor(
+    public router: Router,
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.carregarConta();
@@ -150,6 +155,12 @@ export class Saque implements OnInit {
     this.sucesso  = false;
     this.erro     = '';
     this.valorStr = '';
+  }
+
+  logout(): void {
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
   }
 
   private formatarBRL(valor: number): string {

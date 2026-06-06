@@ -1,7 +1,7 @@
 const express = require('express');
 const axios = require('axios');
-const authMiddleware = require('../middlewares/auth.middleware');
-const tokenBlacklist = require('../security/token-blacklist');
+const authMiddleware = require('./middlewares/auth.middleware');
+const tokenBlacklist = require('./token-blacklist');
 
 const router = express.Router();
 
@@ -31,26 +31,25 @@ router.post('/login', async (req, res, next) => {
 
 router.post('/logout', authMiddleware, async (req, res, next) => {
   try {
-    const response = await axios.post(
-      `${process.env.AUTH_SERVICE_URL}/auth/logout`,
-      {},
-      {
-        headers: {
-          Authorization: req.headers.authorization
+    await axios
+      .post(
+        `${process.env.AUTH_SERVICE_URL}/auth/logout`,
+        {},
+        {
+          headers: {
+            Authorization: req.headers.authorization
+          }
         }
-      }
-    );
+      )
+      .catch(() => null);
 
-    tokenBlacklist.invalidar(req.headers.authorization);
     tokenBlacklist.invalidar(req.token);
-    tokenBlacklist.invalidarUsuario(req.user.cpf);
-
-    return res.status(response.status).json(response.data);
-  } catch (error) {
-    if (error.response) {
-      return res.status(error.response.status).json(error.response.data);
+    if (req.user?.cpf) {
+      tokenBlacklist.invalidarUsuario(req.user.cpf);
     }
 
+    return res.status(204).send();
+  } catch (error) {
     next(error);
   }
 });
