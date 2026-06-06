@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-tela-inicial-administrador',
@@ -22,7 +23,10 @@ export class TelaInicialAdministrador {
     totalSaldoNegativo: number;
   }> = [];
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.carregarDashboard();
   }
 
@@ -65,6 +69,8 @@ export class TelaInicialAdministrador {
   }
 
   logout(): void {
-    this.router.navigate(['/login']);
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
   }
 }
