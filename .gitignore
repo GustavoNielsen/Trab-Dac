@@ -1,0 +1,19 @@
+# Backend - Maven / Java
+**/target/
+*.class
+
+# Node
+**/node_modules/
+
+# Build Angular
+**/dist/
+**/.angular/
+
+# Ambiente / IDE
+.env
+.vscode/
+.idea/
+*.iml
+
+# Logs
+*.log

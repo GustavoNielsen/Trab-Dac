@@ -8,7 +8,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   selector: 'app-editar-gerente',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './editar-gerente.html',
+  templateUrl: './editar-gerentes.html',
 })
 export class EditarGerente implements OnInit {
 
