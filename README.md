@@ -12,7 +12,8 @@ Sistema de **Internet Banking** para a disciplina **DAC**: front-end em **Angula
 scripts\start-dev.bat
 ```
 
-O script sobe o Docker e lista os comandos para abrir **cada serviço em um terminal separado**.
+O script sobe o Docker e lista os comandos para abrir **cada serviço em um terminal separado**.  
+Inclui autenticador, cliente e gerente; para operações de conta, suba também o **`ms-conta`** (porta 8084) conforme a seção manual abaixo.
 
 ### Manual
 
@@ -23,7 +24,8 @@ docker compose up -d
 # 2) Microsserviços (terminais separados)
 cd backend/ms-autenticador && mvnw.cmd spring-boot:run   # porta 8081
 cd backend/ms-cliente      && mvnw.cmd spring-boot:run   # porta 8082
-cd backend/ms-gerente       && mvnw.cmd spring-boot:run   # porta 8083
+cd backend/ms-gerente      && mvnw.cmd spring-boot:run   # porta 8083
+cd backend/ms-conta        && mvnw.cmd spring-boot:run   # porta 8084
 
 # 3) API Gateway (porta 3000)
 cd apiGateway
@@ -57,7 +59,7 @@ npx ng build --configuration development
 | ms-autenticador | **8081** | context-path `/auth` |
 | ms-cliente | **8082** | Postgres schema `cliente` |
 | ms-gerente | **8083** | Postgres schema `gerente` |
-| ms-conta | **8084** | referenciado no gateway (em evolução) |
+| ms-conta | **8084** | Postgres schema `conta` — consulta, saldo, depósito |
 | ms-saga | **8085** | referenciado no gateway (em evolução) |
 | PostgreSQL (Docker) | **5434** | host → container `5432` |
 | MongoDB | **27017** | auth em `bantads_auth` |
@@ -79,15 +81,18 @@ Mongo: **`root` / `password`**.
 | `apiGateway/cliente.routes.js` | Clientes (autocadastro, aprovação, consultas compostas) |
 | `apiGateway/conta.routes.js` | Conta (extrato, saque, transferência) |
 | `apiGateway/gerente.routes.js` | CRUD gerentes (admin) |
+| `apiGateway/config/jwt.js` | Decodifica `JWT_SECRET` (Base64) — mesma chave do ms-autenticador |
 | `apiGateway/middlewares/` | `auth.middleware.js`, `role.middleware.js` |
 | `apiGateway/token-blacklist.js` | Invalidação de JWT no logout |
 | `apiGateway/.env.example` | URLs dos microsserviços e `JWT_SECRET` |
-| `backend/ms-autenticador/` | JWT, login, usuários no MongoDB |
+| `backend/ms-autenticador/` | JWT, login/logout, usuários no MongoDB |
 | `backend/ms-cliente/` | Cadastro e gestão de clientes (Postgres) |
 | `backend/ms-gerente/` | Gerentes operacionais e admin (Postgres) |
+| `backend/ms-conta/` | Contas e movimentações (Postgres schema `conta`) |
 | `backend/ClienteSagaController.java` | Controller SAGA (aprovar/rejeitar/atualizar cliente) — em integração |
+| `.gitignore` | Ignora `target/`, `node_modules/`, `dist/`, `.env` |
 | `docker-compose.yml` | Postgres, MongoDB, RabbitMQ |
-| `init-db/01-schemas.sql` | Schemas `cliente`/`gerente`, tabelas e seed de gerentes |
+| `init-db/01-schemas.sql` | Schemas `cliente`, `gerente`, `conta` + seeds (gerentes, clientes, contas, movimentações) |
 | `scripts/start-dev.bat` | Sobe Docker e orienta startup dos serviços |
 | `scripts/reset-postgres.bat` | Recria volume Postgres (erro de auth no autocadastro) |
 
@@ -114,7 +119,7 @@ O Postgres expõe a porta **5434** no host para evitar conflito com instalaçõe
 
 1. Confirme que só o Docker escuta na 5434: `netstat -ano | findstr :5434`
 2. Execute `scripts\reset-postgres.bat`
-3. Reinicie `ms-cliente` e `ms-gerente`
+3. Reinicie `ms-cliente`, `ms-gerente` e `ms-conta`
 
 ---
 
@@ -129,7 +134,7 @@ O Postgres expõe a porta **5434** no host para evitar conflito com instalaçõe
 | Variável | Exemplo | Uso |
 |----------|---------|-----|
 | `PORT` | `3000` | Porta do gateway |
-| `JWT_SECRET` | *(base64)* | Validação de JWT nos middlewares |
+| `JWT_SECRET` | *(base64)* | Mesmo valor do `ms-autenticador`; decodificado em `config/jwt.js` |
 | `AUTH_SERVICE_URL` | `http://localhost:8081` | ms-autenticador |
 | `CLIENTE_SERVICE_URL` | `http://localhost:8082` | ms-cliente |
 | `GERENTE_SERVICE_URL` | `http://localhost:8083` | ms-gerente |
@@ -163,8 +168,13 @@ Rotas protegidas passam por `authMiddleware` (JWT + blacklist) e, quando aplicá
 | `GET` | `/clientes?filtro=melhores_clientes` | Gerente | Top 3 por saldo |
 | `GET` | `/gerentes` | Admin | Listagem / dashboard |
 | `POST` | `/gerentes` | Admin | Cadastro via SAGA |
+| `GET` | `/contas/:numero/saldo` | Cliente/Gerente/Admin | Saldo da conta |
+| `POST` | `/contas/:numero/depositar` | Cliente | Depósito |
+| `POST` | `/contas/:numero/sacar` | Cliente | Saque |
+| `POST` | `/contas/:numero/transferir` | Cliente | Transferência |
+| `GET` | `/contas/:numero/extrato` | Cliente/Gerente/Admin | Extrato |
 
-Demais operações de conta e relatórios admin: ver `conta.routes.js` e `cliente.routes.js`.
+Relatórios admin e endpoints internos: ver `cliente.routes.js` e `conta.routes.js`.
 
 ---
 
@@ -205,9 +215,22 @@ mvnw.cmd spring-boot:run
 - `GerenteController` — consulta de gerentes
 - Seed inicial de 3 gerentes operacionais em `init-db/01-schemas.sql`
 
-### ms-conta e ms-saga
+### ms-conta (8084)
 
-Referenciados nas URLs do gateway (`8084`, `8085`). Operações como aprovação de cliente, rejeição, alteração de perfil e CRUD de gerentes dependem deles. O arquivo `backend/ClienteSagaController.java` indica a orquestração SAGA em construção.
+```bash
+cd backend/ms-conta
+mvnw.cmd spring-boot:run
+```
+
+- Postgres schema **`conta`** (porta host **5434**)
+- Entidades: `Conta`, `Movimentacao` (`DEPOSITO`, `SAQUE`, `TRANSFERENCIA`)
+- `ContaController`: consulta por número/CPF, saldo, depósito
+- Seed em `init-db/01-schemas.sql` (contas e movimentações do enunciado)
+- Saque, transferência e extrato: rotas no **gateway**; implementação no ms-conta em evolução
+
+### ms-saga (8085)
+
+Referenciado em `SAGA_SERVICE_URL`. Aprovação/rejeição de cliente, alteração de perfil e CRUD de gerentes passam por ele. O arquivo `backend/ClienteSagaController.java` indica a orquestração SAGA em construção (pasta `ms-saga` ainda não no repo).
 
 (Linux/macOS: substitua `mvnw.cmd` por `./mvnw`.)
 
@@ -225,8 +248,10 @@ Referenciados nas URLs do gateway (`8084`, `8085`). Operações como aprovação
 
 - Serviço: `frontend/src/app/services/auth.service.ts`
 - Login: `POST http://localhost:3000/auth/login`
-- Após login: `localStorage` com **`token`**, **`access_token`**, **`user`**, **`role`**
+- Logout: `POST http://localhost:3000/auth/logout` (invalida token no gateway) + limpa `localStorage`
+- Sessão: **`token`**, **`access_token`**, **`user`**, **`role`**; helpers `getToken()`, `getRole()`, `getUser()`
 - **`authGuard`**: rotas de cliente, gerente e admin exigem login; fallback redireciona para `/login`
+- Telas de cliente/admin chamam `authService.logout()` no botão Sair
 
 ### Rotas (`frontend/src/app/app.routes.ts`)
 
@@ -251,21 +276,23 @@ Telas de CRUD de gerentes (`listar`, `inserir`, `editar`) existem em `pages/admi
 
 | Fluxo | Estado |
 |-------|--------|
-| **Autocadastro** (`/cadastro`) | Integrado — `ClienteService.autocadastrar()` → `POST /clientes` |
-| **Login** | Integrado — gateway → ms-autenticador |
-| **Aprovar cliente** | Parcial — gateway/SAGA prontos; front em evolução |
-| **Operações de conta** | Stub/mock até ms-conta completo |
+| **Autocadastro** (`/cadastro`) | Integrado — `POST /clientes` → ms-cliente |
+| **Login / logout** | Integrado — gateway → ms-autenticador + blacklist |
+| **Saque / transferência / extrato** | Front chama gateway (`/contas/...`); depende de ms-conta |
+| **Depósito** | Gateway + ms-conta (`depositar`) |
+| **Aprovar cliente** | Parcial — gateway/SAGA; front em evolução |
 | **Gerente (localStorage)** | Legado em algumas telas — migrar para API |
 
 ---
 
 ## Estado atual do projeto
 
-- **Autocadastro ponta a ponta:** front → gateway → ms-cliente → Postgres (com gerente de menor carga).
-- **Auth:** gateway modular com JWT, blacklist e auth guard no Angular.
-- **ms-gerente** e schemas Postgres seedados; **ms-conta** e **ms-saga** ainda em integração.
+- **Autocadastro ponta a ponta:** front → gateway → ms-cliente → Postgres.
+- **Auth:** JWT unificado (`config/jwt.js`), blacklist, logout no front e no gateway.
+- **ms-conta:** consulta e depósito implementados; saque/transferência/extrato no gateway aguardam ms-conta completo.
+- **Banco seedado:** gerentes, clientes, contas e movimentações em `init-db/01-schemas.sql`.
 - **Build do front:** `npx ng build --configuration development` deve passar.
-- **Pendências:** unificar telas de gerente com API (sair do `localStorage`), ms-conta/ms-saga operacionais, rotas explícitas do CRUD admin, extrato real.
+- **Pendências:** `ms-saga` completo, CRUD admin com rotas em `app.routes.ts`, gerente sem `localStorage`.
 
 ---
 
@@ -283,12 +310,13 @@ Telas de CRUD de gerentes (`listar`, `inserir`, `editar`) existem em `pages/admi
 ## Checklist antes de apresentar
 
 - [ ] `docker compose up -d` (Postgres na **5434**, Mongo na **27017**)
-- [ ] `ms-autenticador`, `ms-cliente`, `ms-gerente` rodando
+- [ ] `ms-autenticador`, `ms-cliente`, `ms-gerente`, `ms-conta` rodando
 - [ ] `apiGateway/.env` configurado; gateway na **3000**
 - [ ] `npm start` no `frontend/` — app em **4200**
 - [ ] `npx ng build` sem erro
 - [ ] Autocadastro e login testados manualmente
-- [ ] ms-conta / ms-saga no ar, se for demo de aprovação ou conta
+- [ ] `JWT_SECRET` no `.env` do gateway **igual** ao do ms-autenticador
+- [ ] ms-saga no ar, se for demo de aprovação de cliente ou CRUD gerente via SAGA
 
 ---
 
