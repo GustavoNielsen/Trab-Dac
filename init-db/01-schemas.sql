@@ -57,3 +57,51 @@ INSERT INTO cliente.clientes (
      'Rua Beta', '500', '', '80000-004', 'Centro', 'Curitiba', 'PR',
      '64065268052', 'APROVADO')
 ON CONFLICT (cpf) DO NOTHING;
+
+CREATE SCHEMA IF NOT EXISTS conta;
+
+CREATE TABLE IF NOT EXISTS conta.contas (
+    numero VARCHAR(10) PRIMARY KEY,
+    cpf_cliente VARCHAR(11) NOT NULL,
+    saldo NUMERIC(15, 2) NOT NULL DEFAULT 0,
+    limite NUMERIC(15, 2) NOT NULL DEFAULT 0,
+    cpf_gerente VARCHAR(11) NOT NULL,
+    data_criacao DATE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS conta.movimentacoes (
+    id BIGSERIAL PRIMARY KEY,
+    conta_numero VARCHAR(10) NOT NULL,
+    tipo VARCHAR(20) NOT NULL,
+    data_hora TIMESTAMP NOT NULL,
+    valor NUMERIC(15, 2) NOT NULL,
+    cpf_origem VARCHAR(11),
+    cpf_destino VARCHAR(11)
+);
+
+-- Contas pré-cadastradas (dados do enunciado)
+INSERT INTO conta.contas (numero, cpf_cliente, saldo, limite, cpf_gerente, data_criacao) VALUES
+    ('1291', '12912861012', 800.00, 5000.00, '98574307084', '2000-01-01'),
+    ('0950', '09506382000', -10000.00, 10000.00, '64065268052', '1990-10-10'),
+    ('8573', '85733854057', -1000.00, 1500.00, '23862179060', '2012-12-12'),
+    ('5887', '58872160006', 150000.00, 0.00, '98574307084', '2022-02-22'),
+    ('7617', '76179646090', 1500.00, 0.00, '64065268052', '2025-01-01')
+ON CONFLICT (numero) DO NOTHING;
+
+-- Movimentações pré-cadastradas (dados do enunciado)
+INSERT INTO conta.movimentacoes (conta_numero, tipo, data_hora, valor, cpf_origem, cpf_destino) VALUES
+    ('1291', 'DEPOSITO',      '2020-01-01 10:00', 1000.00, NULL, NULL),
+    ('1291', 'DEPOSITO',      '2020-01-01 11:00',  900.00, NULL, NULL),
+    ('1291', 'SAQUE',         '2020-01-01 12:00',  550.00, NULL, NULL),
+    ('1291', 'SAQUE',         '2020-01-01 13:00',  350.00, NULL, NULL),
+    ('1291', 'DEPOSITO',      '2020-01-10 15:00', 2000.00, NULL, NULL),
+    ('1291', 'SAQUE',         '2020-01-15 08:00',  500.00, NULL, NULL),
+    ('1291', 'TRANSFERENCIA', '2020-01-20 12:00', 1700.00, '12912861012', '09506382000'),
+    ('0950', 'DEPOSITO',      '2025-01-01 12:00', 1000.00, NULL, NULL),
+    ('0950', 'DEPOSITO',      '2025-01-02 10:00', 5000.00, NULL, NULL),
+    ('0950', 'SAQUE',         '2025-01-10 10:00',  200.00, NULL, NULL),
+    ('0950', 'DEPOSITO',      '2025-02-05 10:00', 7000.00, NULL, NULL),
+    ('8573', 'DEPOSITO',      '2025-05-05 00:00', 1000.00, NULL, NULL),
+    ('8573', 'SAQUE',         '2025-05-06 00:00', 2000.00, NULL, NULL),
+    ('5887', 'DEPOSITO',      '2025-06-01 00:00', 150000.00, NULL, NULL),
+    ('7617', 'DEPOSITO',      '2025-07-01 00:00', 1500.00, NULL, NULL);
